@@ -28,3 +28,6 @@ app.use('/',getJobByCompany)
 app.listen(process.env.PORT,()=>{
     console.log("server start")
 })
+
+
+

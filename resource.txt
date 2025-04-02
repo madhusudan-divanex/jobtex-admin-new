@@ -1,0 +1,49 @@
+
+first name 
+last name 
+email 
+
+profile url 
+phone number 
+current salary 
+expected salary 
+dob 
+gender 
+matiral status 
+location 
+job title (array)
+skill (array)
+about me 
+employeer skill 
+
+// education another table
+education name 
+university name 
+degree type 
+field of stude 
+gpa 
+start Date 
+end date 
+description 
+
+// work experience 
+experience name
+company name 
+job title 
+employment type 
+start date 
+end date
+description 
+
+
+// certification 
+certification name
+certifiaction file 
+
+// language 
+language name 
+in profiency 
+
+// social network 
+social name 
+social url
