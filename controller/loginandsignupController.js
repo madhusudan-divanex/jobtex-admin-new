@@ -9,7 +9,6 @@ async function loginController(req,res) {
         const existUser=await User.findOne({email})
         if(existUser){
             if(bcrypt.compare(password,existUser.password)){
-                
                 jwt.sign({existUser},process.env.SECRET_KEY,{expiresIn:'1d'},(err,token)=>{
                     if(err){
                         return res.status(200).json({message:'error in token genertaion',success:false})
@@ -29,7 +28,6 @@ async function signUpController(req,res) {
         const existUser=await User.findOne({email})
         if(existUser){            
             return res.status(200).json({message:'user already exist',success:false})
-
         }
         const hashpassword=await bcrypt.hash(password,10)
         const newUser=await User.create({
@@ -61,7 +59,6 @@ async function resetController(req,res) {
             existUser.save()
             return res.json({token,message:"password rest",success:true})
         }
-        
     } catch (error) {
         return res.status(500).json({message:error,success:false})
     }
