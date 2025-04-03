@@ -10,6 +10,7 @@ import { fileURLToPath } from 'url';
 import { createReport, getAllReport, getReportById } from './routes/report.js';
 import { adminLogin, getEmployeeAll, planEmployee } from './routes/admin/Login.js';
 import { createDetail, createProfile, deleteCv, getEmployeeData, updateCv, uploadCv } from './routes/employees.js';
+import { verifyToken } from './routes/verify-route.js';
 
 const app=express()
 dotenv.config();
@@ -56,6 +57,7 @@ app.use('/',getReportById)
 app.use('/',adminLogin)
 app.use('/',getEmployeeAll)
 app.use('/',planEmployee)
+app.use('/',verifyToken)
 
 app.listen(process.env.PORT,()=>{
     console.log("server start")
