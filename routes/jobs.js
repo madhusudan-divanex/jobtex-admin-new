@@ -12,7 +12,7 @@ const deleteJob=express.Router();
 deleteJob.delete('/delete-job/:id',verify,deleteJobController)
 
 const getAllJob=express.Router();
-getAllJob.get('/get-all-job',getAllJobController)
+getAllJob.get('/get-all-job',verify,getAllJobController)
 
 const getJobByCompany=express.Router()
 getJobByCompany.get('/get-job-by-company',getJobByIdJobController)

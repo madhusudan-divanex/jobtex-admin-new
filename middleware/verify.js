@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken'
 const verify=(req,res,next)=>{
     const token=req.header('Token')
     if(!token){
-        return res.status(401).json({message:"invalid token",success:false})
+        return res.status(401).json({message:"token required",success:false})
     }
   try{
         const decodeUser=jwt.verify(token,process.env.SECRET_KEY)

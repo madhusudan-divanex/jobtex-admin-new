@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import User from '../models/employee/User.js';
 
 async function adminLoginController(req, res) {
-    console.log("called", req.body);
+   
     const { email, password } = req.body;
 
     try {
@@ -43,4 +43,22 @@ async function getEmployeeAllController(req, res) {
     }
 }
 
-export { adminLoginController ,getEmployeeAllController};
+async function getEmployeePlanController(req, res) {
+  
+    try {
+        const freeEmployees=await User.find({plan:'Free'});
+        const standardEmployees=await User.find({plan:'Standard'});
+        const ultraEmployees=await User.find({plan:'Ultra'});
+       
+        
+        return res.status(200).json({ freeEmployees,standardEmployees,ultraEmployees, message: "Employee Fetched", success: true });
+           
+       
+    } catch (error) {
+        
+        return res.status(500).json({ message: error.message, success: false });
+    }
+}
+
+
+export { adminLoginController ,getEmployeeAllController,getEmployeePlanController};

@@ -32,10 +32,10 @@ async function getAllReportController(req,res) {
 
 async function getReportByIdController(req,res) {
     const id=req.params.id
-    console.log(id)
+  
     try {
         const findReport=await Report.findOne({_id:id})
-        console.log(findReport)
+    
         if(findReport){
             return res.status(200).json({message:"report Fetched",report:findReport,success:true})
         }

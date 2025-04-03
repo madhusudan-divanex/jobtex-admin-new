@@ -8,7 +8,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { createReport, getAllReport, getReportById } from './routes/report.js';
-import { adminLogin, getEmployeeAll } from './routes/admin/Login.js';
+import { adminLogin, getEmployeeAll, planEmployee } from './routes/admin/Login.js';
 import { createDetail, createProfile, deleteCv, getEmployeeData, updateCv, uploadCv } from './routes/employees.js';
 
 const app=express()
@@ -55,6 +55,7 @@ app.use('/',getReportById)
 //      Admin
 app.use('/',adminLogin)
 app.use('/',getEmployeeAll)
+app.use('/',planEmployee)
 
 app.listen(process.env.PORT,()=>{
     console.log("server start")
