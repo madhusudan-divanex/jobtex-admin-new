@@ -3,7 +3,7 @@ import mongoose, { Schema } from 'mongoose';
 const languageSchema = new Schema({
     language_name:String,
     language_profiency :String,
-    userId: {
+    user_id: {
             type: mongoose.Schema.Types.ObjectId,  
             ref: 'user',
             required: true
@@ -16,10 +16,10 @@ const languageSchema = new Schema({
 });
 
 languageSchema.pre('deleteOne', { document: true, query: false }, async function(next) {
-    const userId = this.userId;  
+    const user_id = this.user_id;  
 
 
-    await mongoose.model('language').deleteMany({ userId: userId });
+    await mongoose.model('language').deleteMany({ user_id: user_id });
 
     next();
 });

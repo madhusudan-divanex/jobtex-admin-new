@@ -14,7 +14,7 @@ const informationSchema = new Schema({
     job_title:[String],
     skill:[String],
     employeer_skill:[String],
-    userId: {
+    user_id: {
         type: mongoose.Schema.Types.ObjectId,  
         ref: 'user',
         required: true
@@ -26,13 +26,13 @@ const informationSchema = new Schema({
 });
 
 informationSchema.pre('deleteOne', { document: true, query: false }, async function(next) {
-    const userId = this.userId;  
+    const user_id = this.user_id;  
 
 
-    await mongoose.model('information').deleteMany({ userId: userId });
+    await mongoose.model('information').deleteMany({ user_id: user_id });
 
     next();
 });
- const Inofrmation = mongoose.model('information', InofrmationSchema);
+ const Inofrmation = mongoose.model('information', informationSchema);
 
 export default Inofrmation;

@@ -10,7 +10,7 @@ const experienceSchema = new Schema({
     start_date:Date,
     end_date:Date,
     description:String,
-    userId: {
+    user_id: {
         type: mongoose.Schema.Types.ObjectId,  
         ref: 'user',
         required: true
@@ -23,10 +23,10 @@ const experienceSchema = new Schema({
 });
 
 experienceSchema.pre('deleteOne', { document: true, query: false }, async function(next) {
-    const userId = this.userId;  
+    const user_id = this.user_id;  
 
 
-    await mongoose.model('experience').deleteMany({ userId: userId });
+    await mongoose.model('experience').deleteMany({ user_id: user_id });
 
     next();
 });

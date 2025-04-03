@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken'
 
 const verify=(req,res,next)=>{
-    const token=req.header('token')
+    const token=req.header('Token')
     if(!token){
         return res.status(401).json({message:"invalid token",success:false})
     }

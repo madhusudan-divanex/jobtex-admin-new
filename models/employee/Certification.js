@@ -2,9 +2,9 @@ import mongoose, { Schema } from 'mongoose';
 
 
 const certificationSchema = new Schema({
-    certification_name:String,
+    // certification_name:String,
     certification_url :String,
-    userId: {
+    user_id: {
             type: mongoose.Schema.Types.ObjectId,  
             ref: 'user',
             required: true
@@ -16,10 +16,10 @@ const certificationSchema = new Schema({
     }
 });
 certificationSchema.pre('deleteOne', { document: true, query: false }, async function(next) {
-    const userId = this.userId;  
+    const user_id = this.user_id;  
 
 
-    await mongoose.model('certification').deleteMany({ userId: userId });
+    await mongoose.model('certification').deleteMany({ user_id: user_id });
 
     next();
 });

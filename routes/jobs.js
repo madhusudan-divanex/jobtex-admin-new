@@ -1,14 +1,15 @@
 import express from 'express'
 import { deleteJobController, editJobController, getAllJobController, getJobByIdJobController, newJobController } from '../controller/jobController.js'
+import verify from '../middleware/verify.js'
 
 const newJob=express.Router()
-newJob.post('/create-new-job',newJobController)
+newJob.post('/create-new-job',verify,newJobController)
 
 const editJob=express.Router()
-editJob.post('/edit-job',editJobController)
+editJob.post('/edit-job',verify,editJobController)
 
 const deleteJob=express.Router();
-deleteJob.delete('/delete-job/:id',deleteJobController)
+deleteJob.delete('/delete-job/:id',verify,deleteJobController)
 
 const getAllJob=express.Router();
 getAllJob.get('/get-all-job',getAllJobController)
