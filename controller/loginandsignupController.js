@@ -1,5 +1,5 @@
 import User from "../models/employee/User.js";
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { verificationMail } from "../mail/Verification.js";
 import { forgotMail } from "../mail/Forgot.js";
