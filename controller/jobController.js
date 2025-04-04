@@ -1,20 +1,21 @@
 import Job from "../models/Job.js"
 
 async function newJobController(req,res) {
-   
-    const {title,description,location,salary,type,experience,company_name,company_detail,job_post_date,job_expiry_date}=req.body.jobForm;
+    console.log(req.body)
+    const {title,description,location,min_salary,max_salary,type,skills,experience,company_name,company_detail,job_post_date,job_expiry_date}=req.body;
     try {
         
             const createJob = await Job.create(                
                 {
                     title,
                     description,
-                    salary,
+                    min_salary,max_salary,
                     type,
                     location,
                     experience,
                     company_name,
                     company_detail,
+                    skills,
                     job_post_date,
                     job_expiry_date
                 } 
@@ -33,7 +34,7 @@ async function newJobController(req,res) {
     }
 }
 async function editJobController(req,res) {
-    const {title,description,location,salary,type,experience,company_name,company_detail,job_post_date,job_expiry_date,id}=req.body.jobForm;
+    const {title,description,location,salary,type,experience,company_name,company_detail,job_post_date,job_expiry_date,id}=req.body.jobData;
     try {
         const findJob=await Job.findOne({_id:id})
         if(findJob){
@@ -100,8 +101,8 @@ async function getJobByCompanyJobController(req,res) {
     }
 }
 async function getJobByIdJobController(req,res) {
-    
     const id=req.params.id
+    console.log("called",id)
     try {
         const findJob=await Job.findOne({_id:id})
         if(findJob){

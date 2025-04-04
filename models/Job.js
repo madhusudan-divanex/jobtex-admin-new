@@ -9,8 +9,13 @@ const jobSchema = new Schema({
         maxlength: [50, 'Title cannot exceed 100 characters']  
     },
     type: {
-        type: String,
+        type: [String],
         required: [true, 'Job Type is required'],  
+       
+    },
+    skills: {
+        type: [String],
+        required: [true, 'Job Skill is required'],  
        
     },
     description: {
@@ -22,9 +27,13 @@ const jobSchema = new Schema({
         type: String,
         required: [true, 'location is required']
     },
-    salary: {
+    min_salary: {
         type: Number,
-        required: [true, 'Salary is required']
+        required: [true, 'Minimum Salary is required']
+    },
+    max_salary: {
+        type: Number,
+        required: [true, 'MaximumSalary is required']
     },
     experience: {
         type: Number,
