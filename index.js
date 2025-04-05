@@ -12,6 +12,7 @@ import { adminLogin, getEmployeeAll, planEmployee } from './routes/admin/Login.j
 import { createDetail, createProfile, deleteCv, getEmployeeData, updateCv, uploadCv } from './routes/employees.js';
 import { verifyToken } from './routes/verify-route.js';
 import { createPlan, deletePlan, getPlan, updatePlan } from './routes/admin/Plan.js';
+import { createStaff, deleteStaff, getStaff, getStaffById, updateStaff } from './routes/admin/Staff.js';
 
 const app=express()
 dotenv.config();
@@ -65,6 +66,13 @@ app.use('/',createPlan)
 app.use('/',getPlan)
 app.use('/',updatePlan)
 app.use('/',deletePlan)
+
+//      Staff
+app.use('/',createStaff)
+app.use('/',getStaff)
+app.use('/',getStaffById)
+app.use('/',updateStaff)
+app.use('/',deleteStaff)
 
 app.listen(process.env.PORT,()=>{
     console.log("server start")

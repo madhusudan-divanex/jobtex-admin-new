@@ -40,9 +40,9 @@ async function updatePlanController(req,res) {
             {new:true}
         )
         if(!newPlan){
-            return res.status(500).json({message:"plan not created",success:false})
+            return res.status(500).json({message:"plan not updated",success:false})
         }
-        return res.status(200).json({message:"Plan created",success:true})
+        return res.status(200).json({message:"Plan updatedeated",success:true})
     } catch (error) {
         return res.status(500).json({message:error.message,success:false})
     }

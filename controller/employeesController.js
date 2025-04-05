@@ -6,6 +6,7 @@ import Inofrmation from "../models/employee/Information.js";
 import Language from "../models/employee/Language.js";
 import User from "../models/employee/User.js";
 import fs from 'fs';
+import Role from "../models/Role.js";
 import path from 'path';
 
 async function createProfileController(req, res) {
@@ -20,7 +21,7 @@ async function createProfileController(req, res) {
             if (!newProfile) {
                 return res.status(500).json({ message: "profile creation failed", success: false })
             }
-            return res.status(200).json({ profile: newProfile, message: "profile creation success", success: false })
+            return res.status(200).json({ profile: newProfile, message: "profile creation success", success: true })
         }
     } catch (error) {
         return res.status(500).json({ message: error, success: false })
