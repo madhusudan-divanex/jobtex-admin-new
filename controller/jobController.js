@@ -27,6 +27,7 @@ async function newJobController(req,res) {
             return res.status(200).json({message:"job created",job:createJob,success:true})
        
     } catch (error) {
+        console.log(error)
         if (error.name === 'ValidationError') {
             return res.status(400).json({ message: error.message, success: false });
         }
@@ -34,7 +35,7 @@ async function newJobController(req,res) {
     }
 }
 async function editJobController(req,res) {
-    const {title,description,location,salary,type,experience,company_name,company_detail,job_post_date,job_expiry_date,id}=req.body.jobData;
+    const {title,description,location,salary,type,experience,company_name,company_detail,job_post_date,job_expiry_date,id}=req.body;
     try {
         const findJob=await Job.findOne({_id:id})
         if(findJob){
