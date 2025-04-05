@@ -13,7 +13,7 @@ const roleSchema = new Schema({
     access: {
         type: [String],
         required: [true, 'Access is required'],
-        minlength: [20, 'Access must be at least 20 characters long'], 
+        minlength: [5, 'Access must be at least 20 characters long'], 
     },
     email: {
         type: String,
