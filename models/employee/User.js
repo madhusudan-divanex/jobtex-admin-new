@@ -17,6 +17,10 @@ const userSchema = new Schema({
     plan: {
         type: String,
         default:'Free'
+    } ,
+    isPro: {
+        type: Boolean,
+        default:true
     },
     email: {
         type: String,
@@ -28,6 +32,15 @@ const userSchema = new Schema({
         type: String,
         required: [true, 'Password is required'],
         minlength: [6, 'Password must be at least 6 characters long'], 
+    },
+    acccount_satus:{
+         type: String,
+        default:'active'
+    },
+    signup_location:{
+        type: String,
+        required: [true, 'Location is required'],
+        minlength: [3, 'Location must be at least 3 characters long'], 
     },
     createdAt: {
         type: Date,

@@ -8,9 +8,20 @@ const jobSchema = new Schema({
         minlength: [5, 'Title must be at least 5 characters long'],  
         maxlength: [50, 'Title cannot exceed 100 characters']  
     },
+    role: {
+        type: String,
+        required: [true, 'Role is required'],  
+        minlength: [5, 'Role must be at least 5 characters long'],  
+        maxlength: [50, 'Role cannot exceed 100 characters']  
+    },
     type: {
         type: [String],
         required: [true, 'Job Type is required'],  
+       
+    },
+    category: {
+        type: String,
+        required: [true, 'Job Category is required'],  
        
     },
     skills: {

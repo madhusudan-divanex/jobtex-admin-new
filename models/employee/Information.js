@@ -18,12 +18,8 @@ const informationSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,  
         ref: 'user',
         required: true
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now
     }
-});
+},{ timestamps: true });
 
 informationSchema.pre('deleteOne', { document: true, query: false }, async function(next) {
     const user_id = this.user_id;  

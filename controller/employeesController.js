@@ -132,14 +132,97 @@ async function createDetailController(req, res) {
 
 }
 
+async function updateDetailController(req, res) {
+    const { user_id } = req.body;
+    const { educationForm, experienceForm, certificationForm, languageForm, skillForm } = req.body;
+
+    try {
+      
+        const findUser = await User.findOne({ _id: user_id });
+        if (!findUser) {
+            return res.status(400).json({ message: "User not found", success: false });
+        }
+
+      
+        let isEducationUpdated = false;
+        let isExperienceUpdated = false;
+        let isCertificationUpdated = false;
+        let isLanguageUpdated = false;
+        let isSkillUpdated = false;
+
+      
+        if (educationForm && educationForm.length > 0) {
+            isEducationUpdated = true;
+          
+            await Education.deleteMany({ user_id });
+            const educationEntries = educationForm.map(edu => ({
+                ...edu,
+                user_id,
+            }));
+            await Education.insertMany(educationEntries);
+        }
+
+      
+        if (experienceForm && experienceForm.length > 0) {
+            isExperienceUpdated = true;
+          
+            await Experience.deleteMany({ user_id });
+            const experienceEntries = experienceForm.map(exp => ({
+                ...exp,
+                user_id,
+            }));
+            await Experience.insertMany(experienceEntries);
+        }
+
+      
+        if (certificationForm && certificationForm.length > 0) {
+            isCertificationUpdated = true;
+           
+            await Certification.deleteMany({ user_id });
+            const certificationEntries = certificationForm.map(cer => ({
+                ...cer,
+                user_id,
+            }));
+            await Certification.insertMany(certificationEntries);
+        }
+
+      
+        if (languageForm && languageForm.length > 0) {
+            isLanguageUpdated = true;
+           
+            await Language.deleteMany({ user_id });
+            const languageEntries = languageForm.map(lan => ({
+                ...lan,
+                user_id,
+            }));
+            await Language.insertMany(languageEntries);
+        }
+
+     
+        if (skillForm && skillForm.length > 0) {
+            isSkillUpdated = true;
+           
+            await User.findByIdAndUpdate({ _id: user_id }, { skill: skillForm }, { new: true });
+        }
+
+        return res.status(200).json({ message: "Profile updated successfully", success: true });
+
+    } catch (error) {
+        return res.status(500).json({ message: error.message, success: false });
+    }
+}
+
+
 async function uploadCvController(req,res) {
-    const {user_id,cv_file}=req.body;
+    const {user_id,cv_file,cover_file}=req.body;
     try {
         const path = req.files["cv_file"] ? req.files["cv_file"][0].path : null;
+        const coverPath = req.files["over_file"] ? req.files["cover_file"][0].path : null;
         const newCv=await Cv.create({
             user_id,
             
-            cv_file:path
+            cv_file:path,
+            cover_file:coverPath
         })
         if(!newCv){
             return res.status(500).json({message:"cv not uploaded ",success:false})
@@ -151,15 +234,16 @@ async function uploadCvController(req,res) {
 }
 
 async function updateCvController(req, res) {
-    const { cv_id } = req.body;  
+    const { cv_file,cover_file,cv_id } = req.body;  
   
     try {
       
       const existingCv = await Cv.findById(cv_id);
       if (!existingCv) {
         return res.status(404).json({ message: "CV not found", success: false });
-      }      
-      const oldFilePath = existingCv.cv_file;
+      }   
+      if(cv_file){
+        const oldFilePath = existingCv.cv_file;
       if (!req.files || !req.files["cv_file"]) {
         return res.status(400).json({ message: "No file uploaded", success: false });
       }
@@ -170,7 +254,22 @@ async function updateCvController(req, res) {
       existingCv.cv_file = newFilePath;
       await existingCv.save();      
       return res.status(200).json({ message: "CV updated successfully", success: true, file: newFilePath });
-  
+      }   
+      if(cover_file){
+
+      
+      const oldFilePath = existingCv.cv_file;
+      if (!req.files || !req.files["cover_file"]) {
+        return res.status(400).json({ message: "No file uploaded", success: false });
+      }
+      const newFilePath = req.files["cover_file"][0].path;      
+      if (fs.existsSync(oldFilePath)) {
+        fs.unlinkSync(oldFilePath); 
+      }      
+      existingCv.cover_file = newFilePath;
+      await existingCv.save();      
+      return res.status(200).json({ message: "Cover updated successfully", success: true, file: newFilePath });
+    }
     } catch (error) {
       console.error(error);
       return res.status(500).json({ message: error.message, success: false });

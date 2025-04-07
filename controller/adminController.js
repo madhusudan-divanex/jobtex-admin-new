@@ -170,4 +170,5 @@ async function deleteStaffController(req, res) {
         return res.status(500).json({ message: error.message, success: false });
     }
 }
+
 export { adminLoginController ,getEmployeeAllController,getEmployeePlanController ,createStaffController,getStaffController,getStaffByIdController,updateStaffController,deleteStaffController};

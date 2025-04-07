@@ -4,6 +4,7 @@ import mongoose, { Schema } from 'mongoose';
 const cvSchema = new Schema({
     
     cv_file :String,
+    cover_file :String,
     user_id: {
             type: mongoose.Schema.Types.ObjectId,  
             ref: 'user',

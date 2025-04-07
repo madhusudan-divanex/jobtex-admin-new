@@ -13,6 +13,9 @@ import { createDetail, createProfile, deleteCv, getEmployeeData, updateCv, uploa
 import { verifyToken } from './routes/verify-route.js';
 import { createPlan, deletePlan, getPlan, updatePlan } from './routes/admin/Plan.js';
 import { createStaff, deleteStaff, getStaff, getStaffById, updateStaff } from './routes/admin/Staff.js';
+import { applicationFunnel, systemHealth, userInsight } from './routes/admin/dashboardOverview.js';
+import { grantPro, userAction, userDetail, userList } from './routes/admin/userManagement.js';
+import { perUserActivity, systemWiseLog } from './routes/admin/userActivityLogs.js';
 
 const app=express()
 dotenv.config();
@@ -73,6 +76,23 @@ app.use('/',getStaff)
 app.use('/',getStaffById)
 app.use('/',updateStaff)
 app.use('/',deleteStaff)
+
+//      Tailored Job Docs
+
+//      Dashboard Overview
+app.use('/',systemHealth)
+app.use('/',userInsight)
+app.use('/',applicationFunnel)
+
+//      User Management
+app.use('/',userList)
+app.use('/',userDetail)
+app.use('/',userAction)
+app.use('/',grantPro)
+
+//      User Activity Logs
+app.use('/',perUserActivity)
+app.use('/',systemWiseLog)
 
 app.listen(process.env.PORT,()=>{
     console.log("server start")

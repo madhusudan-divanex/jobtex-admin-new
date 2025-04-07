@@ -11,7 +11,7 @@ const verify=(req,res,next)=>{
          next();
         } catch (error) {
             console.log('error'+error)
-            return res.status(401).json({ message: "Token verification unsuccessful",chat:error, success: false });
+            return res.status(401).json({ message: "Session Timeout Please Login",chat:error, success: false });
           }
 
 }

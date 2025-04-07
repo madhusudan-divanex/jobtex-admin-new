@@ -47,3 +47,7 @@ in profiency
 // social network 
 social name 
 social url
+
+
+//      dashboard overview->profile completion rate
+//      user management ->generated cv 
