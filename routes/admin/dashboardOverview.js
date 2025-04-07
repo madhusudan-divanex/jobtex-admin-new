@@ -3,7 +3,7 @@ import verify from '../../middleware/verify.js'
 import { applicationFunnelController, systemHealthController, userInsightController } from '../../controller/dashboardOverviewController.js'
 
 const systemHealth=express.Router()
-systemHealth.get('/system-health',verify,systemHealthController)
+systemHealth.post('/system-health',verify,systemHealthController)
 
 const userInsight=express.Router()
 userInsight.get('/user-insight',verify,userInsightController)

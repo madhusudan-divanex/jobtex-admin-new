@@ -12,6 +12,6 @@ const userAction=express.Router();
 userAction.get('/user-account-action/:id',verify,userActionController)
 
 const grantPro=express.Router();
-grantPro.post('/grant-pro/:id',verify,grantProController)
+grantPro.get('/grant-pro/:id',verify,grantProController)
 
 export {userList,userAction,userDetail,grantPro}

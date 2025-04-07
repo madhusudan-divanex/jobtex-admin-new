@@ -35,7 +35,7 @@ async function getEmployeedataController(req, res) {
         const employee=await User.findById(id);
         const user_id=employee._id
         if (!employee) {
-            return res.status(401).json({ message: "no Employee found", success: false });
+            return res.status(404).json({ message: "no Employee found", success: false });
            
            
         } else {
@@ -60,7 +60,7 @@ async function createDetailController(req, res) {
 
         const findUser = await User.findOne({ _id: user_id })
         if (!findUser) {
-            return res.status(400).json({ message: "user not found", success: false });
+            return res.status(404).json({ message: "user not found", success: false });
         }
         let isEducation = false;
         let isExperience = false;
@@ -124,7 +124,7 @@ async function createDetailController(req, res) {
             const addSkill=await User.findByIdAndUpdate({_id:user_id},{skill:skillForm},{new:true})
         }
 
-        return res.status(201).json({ message: "all added successfully", success: true });
+        return res.status(200).json({ message: "all added successfully", success: true });
 
     } catch (error) {
         return res.status(500).json({ message: error, success: false })
@@ -140,7 +140,7 @@ async function updateDetailController(req, res) {
       
         const findUser = await User.findOne({ _id: user_id });
         if (!findUser) {
-            return res.status(400).json({ message: "User not found", success: false });
+            return res.status(404).json({ message: "User not found", success: false });
         }
 
       

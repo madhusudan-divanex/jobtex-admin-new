@@ -13,7 +13,6 @@ async function perUserActivityController(req, res) {
                     as: "userCv"  // Alias for the Cv data
                 }
             },
-          
             {
                 $addFields: {
                     cvCount: { $size: "$userCv" }  
@@ -83,5 +82,24 @@ async function perUserActivityController(req, res) {
     }
 }
 
+async function systemWiseLogController(req,res) {
+    const {email,id,date_range}=req.body();
+    try {
+        if(email){
+            const oneUser=await User.find({email:email})
+        return res.status(200).json({ message: 'system wise log',user:oneUser, success: true })
+        }
+        else if(id){
+            const oneUser=await User.find({_id:id})
+        return res.status(200).json({ message: 'system wise log', user:oneUser,success: true })
+        }
+        else{
 
-export {perUserActivityController}
+            const oneUser=await User.find({createdAt:date_range})
+            return res.status(200).json({ message: 'system wise log',user:oneUser, success: true })
+        }
+    } catch (error) {
+        return res.status(500).json({ message: error.message, success: false })
+    }
+}
+export {perUserActivityController,systemWiseLogController}

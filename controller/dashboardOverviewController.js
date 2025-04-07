@@ -14,7 +14,7 @@ async function systemHealthController(req, res) {
         // Prepare a date range filter (if provided), otherwise no filter
         let dateFilter = {};
         if (fromDate) {
-            dateFilter.createdAt = { $gte: new Date(fromDate) }; // "createdAt" is an example, adjust accordingly
+            dateFilter.createdAt = { $gte: new Date(fromDate) };
         }
         if (toDate) {
             dateFilter.createdAt = {
@@ -23,7 +23,7 @@ async function systemHealthController(req, res) {
             };
         }
 
-        // Count the documents based on the date filter, or all data if no filter
+
         const totalUser = await User.countDocuments(dateFilter);
         const totalJobs = await Job.countDocuments(dateFilter);
         const totalCvGen = await Cv.countDocuments({
@@ -78,7 +78,8 @@ async function userInsightController(req, res) {
         const femaleUser = await Inofrmation.countDocuments({ gender: 'female' });
         const malePercentage = allUser > 0 ? (maleUser / allUser) * 100 : 0;
         const femalePercentage = allUser > 0 ? (femaleUser / allUser) * 100 : 0;
-
+        const profileData = await Inofrmation.countDocuments()
+        const profileComplete = allUser > 0 ? (profileData / allUser) * 100 : 0;
 
         // daily weekly signup
         const today = new Date();
@@ -105,14 +106,14 @@ async function userInsightController(req, res) {
 
         // profile completion rate
 
-        const data={freeUser,proUser,dailyActiveUser,dailySignup,weeklySignup,malePercentage,femalePercentage,expiredProUser}
-        return res.status(200).json({ message: 'user insight fetch',data, success: false })
+        const data = { freeUser, proUser, dailyActiveUser, profileComplete, dailySignup, weeklySignup, malePercentage, femalePercentage, expiredProUser }
+        return res.status(200).json({ message: 'user insight fetch', data, success: true })
     } catch (error) {
         return res.status(500).json({ message: error.message, success: false })
     }
 }
 
-async function applicationFunnelController(req,res) {
+async function applicationFunnelController(req, res) {
     try {
         const topCategory = await Job.aggregate([
             {
@@ -138,7 +139,7 @@ async function applicationFunnelController(req,res) {
         const topJobRoleLocationCombo = await Job.aggregate([
             {
                 $group: {
-                    _id: { 
+                    _id: {
                         role: "$role",  // Group by job role
                         location: "$location" // Group by location
                     },
@@ -156,16 +157,16 @@ async function applicationFunnelController(req,res) {
                     role: "$_id.role",  // Extract jobRole from _id
                     location: "$_id.location",  // Extract location from _id
                     userCount: 1,
-                    _id: 0  
+                    _id: 0
                 }
             }
         ]);
-        return res.status(200).json({ message: "total job and role fetched",topCategory,topJobRoleLocationCombo, success: false })             
+        return res.status(200).json({ message: "total job and role fetched", topCategory, topJobRoleLocationCombo, success: true })
     } catch (error) {
-        return res.status(500).json({ message: error.message, success: false })        
+        return res.status(500).json({ message: error.message, success: false })
     }
 }
 
 
 
-export { systemHealthController,userInsightController,applicationFunnelController };
+export { systemHealthController, userInsightController, applicationFunnelController };

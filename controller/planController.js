@@ -24,7 +24,7 @@ async function getPlanController(req,res) {
         if(allPlan.length >0 ){
             return res.status(200).json({message:"Plan fetched",plans:allPlan,success:true})
         }
-        return res.status(500).json({message:"plan not found",success:false})
+        return res.status(400).json({message:"plan not found",success:false})
     } catch (error) {
         return res.status(500).json({message:error.message,success:false})
     }

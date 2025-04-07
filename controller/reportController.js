@@ -14,7 +14,7 @@ async function createReportController(req,res) {
         }
         return res.status(200).json({message:"report sent",success:true})
     } catch (error) {
-        return res.status(200).json({message:error,success:false})
+        return res.status(500).json({message:error,success:false})
     }
 }
 
@@ -26,7 +26,7 @@ async function getAllReportController(req,res) {
         }
         return res.status(401).json({message:"no report found",success:true})
     } catch (error) {
-        return res.status(200).json({message:error,success:false})
+        return res.status(500).json({message:error,success:false})
     }
 }
 
@@ -42,7 +42,7 @@ async function getReportByIdController(req,res) {
         return res.status(401).json({message:"no report found",success:false})
     } catch (error) {
         console.log(error)
-        return res.status(200).json({message:error,success:false})
+        return res.status(500).json({message:error,success:false})
     }
 }
 

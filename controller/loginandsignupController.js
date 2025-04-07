@@ -21,7 +21,7 @@ async function loginController(req,res) {
                     const addLogin=await LoginUser.create({
                         user_id:existUser._id
                     })
-                    return res.json({token,message:"login success",user:existUser,success:true})
+                    return res.status(200).json({token,message:"login success",user:existUser,success:true})
                 })   
             }
         }
@@ -66,7 +66,7 @@ async function resetController(req,res) {
             const hashpassword=bcrypt.hash(password,10)
             existUser.password=hashpassword
             existUser.save()
-            return res.json({token,message:"password rest",success:true})
+            return res.status(200).json({token,message:"password rest",success:true})
         }
     } catch (error) {
         return res.status(500).json({message:error,success:false})
@@ -76,7 +76,7 @@ async function forgotController(req,res) {
     const {email}=req.body;
     try {
        await forgotMail(email)
-        return res.json({message:"mail sent",success:true})      
+        return res.status(200).json({message:"mail sent",success:true})      
     } catch (error) {
         return res.status(500).json({message:error,success:false})
     }
