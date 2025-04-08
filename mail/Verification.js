@@ -1,12 +1,12 @@
 import http from "http"
 import nodemailer from "nodemailer";
 
-const verificationMail = async (email) => {
+const verificationMail = async (email,res) => {
    
     const receiver =email
 
     if (!receiver) {
-        return res.status(404).json({ error: "User not found" });
+        return "User not found" 
     }
 
     
@@ -30,9 +30,9 @@ const verificationMail = async (email) => {
 
     transporter.sendMail(mailOptions, (error, info) => {
         if (error) {
-            return res.status(500).json({ error: "Failed to send email" });
+            return  "Failed to send email"
         }
-        return res.json({ success: "Email sent successfully!" });
+        return "Email sent successfully!" 
     });
 };
 

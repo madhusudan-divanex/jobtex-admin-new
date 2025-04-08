@@ -48,7 +48,13 @@ async function signUpController(req,res) {
         if (!newUser) {
             return res.status(400).json({ message: "Signup failed", success: false });
         }
-        await verificationMail(email)
+        const response=await verificationMail(email)
+        if(response =="Failed to send email"){
+            console.log("not sent")
+        }
+        else{
+            console.log("sent",response)
+        }
         return res.status(200).json({token,message:"account created",user:newUser,success:true})
         
     } catch (error) {

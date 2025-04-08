@@ -75,7 +75,8 @@ async function userInsightController(req, res) {
         const femalePercentage = totalUser > 0 ? (femaleUser / totalUser) * 100 : 0;
        
         const profileData = await Inofrmation.countDocuments()
-        const profileComplete = allUser > 0 ? (profileData / allUser) * 100 : 0;
+        const profileComplete = totalUser > 0 ? parseFloat(((profileData / totalUser) * 100).toFixed(2)) : 0;
+
         const lastSixMonths = [];
         for (let i = 0; i < 6; i++) {
             const month = new Date();

@@ -75,5 +75,5 @@ Create system-wide or targeted notifications.
 
 Frontend
 notification add,promocode adding,userlist,create update get delete on signup and plan,
-dashboard card and type of user and daily and Weekly signup data dynamic ,top 10 category 
+dashboard card and type of user  data dynamic ,top 10 category 
 

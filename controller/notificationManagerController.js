@@ -4,10 +4,10 @@ import { weeklyDigestMail } from "../mail/WeeklyDigest.js";
 import AppToast from "../models/AppToast.js";
 
 async function appToastController(req,res) {
-    const {name,type,content,status}=req.body
+    const {name,type,content,status,target_by}=req.body
     try {
         const createToast=await AppToast.create({
-            name,type,content,status
+            name,type,content,status,target_by
         })
         if(!createToast){
             return res.status(500).json({ message:'mail sent', success: false });
@@ -32,10 +32,10 @@ async function getToastController(req,res) {
 }
 
 async function editToastController(req,res) {
-    const {id,name,type,status,content}=req.body
+    const {id,name,type,status,content,target_by}=req.body
     try {
         const editToast=await AppToast.findByIdAndUpdate(id,{
-            name,type,cotent,status,content
+            name,type,cotent,status,content,target_by
         },{new:true})
         if(!editToast){
             return res.status(500).json({ message:'mail sent', success: false });

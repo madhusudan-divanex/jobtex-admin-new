@@ -23,7 +23,10 @@ const appToastSchema = new Schema({
         minlength: [20, 'Content must be at least 20 characters long'],  
         maxlength: [200, 'Content cannot exceed 200 characters']  
     },
-    
+    target_by:{
+         type:String,
+        default:'All'
+    },
     status: {
         type:String,
         default:'active'
