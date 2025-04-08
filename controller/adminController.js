@@ -47,12 +47,14 @@ async function getEmployeeAllController(req, res) {
 async function getEmployeePlanController(req, res) {
   
     try {
-        const freeEmployees=await User.find({plan:'Free'});
-        const standardEmployees=await User.find({plan:'Standard'});
-        const ultraEmployees=await User.find({plan:'Ultra'});
+        const freeEmployees=await User.countDocuments({ plan: 'Free' });
+        const standardEmployees=await User.countDocuments({ plan: 'Standard' });
+        const ultraEmployees=await User.countDocuments({ plan: 'Pro' });
+        const totalUsers=freeEmployees+standardEmployees+ultraEmployees
+        console.log(totalUsers)
        
         
-        return res.status(200).json({ freeEmployees,standardEmployees,ultraEmployees, message: "Employee Fetched", success: true });
+        return res.status(200).json({ freeEmployees,standardEmployees,ultraEmployees,totalUsers, message: "Employee Fetched", success: true });
            
        
     } catch (error) {
@@ -126,22 +128,23 @@ async function getStaffByIdController(req, res) {
 }
 
 async function updateStaffController(req, res) {
-   
+   const id=req.params.id
     const {staff_id,name,type, email, password ,access} = req.body;
 
     try {
-        const findStaff = await Role.find(email)
+        const findStaff = await Role.find({_id:id})
         if (findStaff.length > 0) {
-            const updateStaff = await Role.findByIdAndUpdate(staff_id,{
+            const updateStaff = await Role.findByIdAndUpdate(id,{
                 name,type, email, password ,access
             },{new:true})
 
             if (!updateStaff) {
                 return res.status(500).json({ message: "staff updation failed", success: false })
             }
-            return res.status(200).json({ role: newRole, message: "staff updated successfully", success: true })
+            return res.status(200).json({  message: "staff updated successfully", success: true })
         }
     } catch (error) {
+        console.log(error.message)
         return res.status(500).json({ message: error, success: false })
     }
 }

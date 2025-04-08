@@ -19,13 +19,28 @@ async function userListController(req, res) {
                 }
             },
             {
+                $lookup: {
+                    from: "login user",  
+                    localField: "_id", 
+                    foreignField: "user_id",  
+                    as: "lastActive" 
+                }
+            },
+            
+            {
                 $unwind: {
                     path: "$userInformation",
                     preserveNullAndEmptyArrays: true 
                 }
             },
+            {
+                $unwind: {
+                    path: "$lastActive",
+                    preserveNullAndEmptyArrays: true 
+                }
+            },
         ])
-        return res.status(200).json({ message: 'data fetched',data:mergeData, success: false })
+        return res.status(200).json({ message: 'data fetched',data:mergeData, success: true })
     } catch (error) {
         return res.status(500).json({ message: error.message, success: false })
     }
@@ -42,7 +57,7 @@ async function userDetailController(req,res) {
         const savedJob=await SavedJob.find(id)
         const generateCv=await Generated.find(id)
         const data={generalDetail,informationDetail,lastActive,generateCv,appliedJob,savedJob}
-        return res.status(200).json({ message: 'user detail fetched',data, success: false })
+        return res.status(200).json({ message: 'user detail fetched',data, success: true })
     } catch (error) {
         return res.status(500).json({ message: error.message, success: false })
     }

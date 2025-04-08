@@ -9,7 +9,7 @@ const getStaff=express.Router()
 getStaff.get('/get-staff',verify,getStaffController)
 
 const updateStaff=express.Router()
-updateStaff.put('/update-staff',verify,updateStaffController)
+updateStaff.put('/update-staff/:id',verify,updateStaffController)
 
 const deleteStaff=express.Router()
 deleteStaff.delete('/delete-staff/:id',verify,deleteStaffController)

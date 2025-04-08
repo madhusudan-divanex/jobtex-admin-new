@@ -13,7 +13,7 @@ const subscriptionSchema = new Schema({
         ref: 'user',
         required: true
     },
-
+    status:String,
     start_date: {
         type: Date,
         default: Date.now
@@ -22,7 +22,7 @@ const subscriptionSchema = new Schema({
         type: Date
        
     }
-});
+},{ timestamps: true });
 
 subscriptionSchema.pre('deleteOne', { document: true, query: false }, async function(next) {
     const user_id = this.user_id;  

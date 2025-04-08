@@ -16,6 +16,8 @@ import { createStaff, deleteStaff, getStaff, getStaffById, updateStaff } from '.
 import { applicationFunnel, systemHealth, userInsight } from './routes/admin/dashboardOverview.js';
 import { grantPro, userAction, userDetail, userList } from './routes/admin/userManagement.js';
 import { perUserActivity, systemWiseLog } from './routes/admin/userActivityLogs.js';
+import { appToast, editToast, getToast, planExpiry, usesReminder, weeklyDigest } from './routes/admin/notificationsManager.js';
+import { createPromo, editPromo } from './routes/admin/promoTrials.js';
 
 const app=express()
 dotenv.config();
@@ -79,20 +81,33 @@ app.use('/',deleteStaff)
 
 //      Tailored Job Docs
 
-//      Dashboard Overview
+//      🧭 1. Dashboard Overview
 app.use('/',systemHealth)
 app.use('/',userInsight)
 app.use('/',applicationFunnel)
 
-//      User Management
+//      👥 2. User Management
 app.use('/',userList)
 app.use('/',userDetail)
 app.use('/',userAction)
 app.use('/',grantPro)
 
-//      User Activity Logs
+//      🕵️‍♀️ 3. User Activity Logs
 app.use('/',perUserActivity)
 app.use('/',systemWiseLog)
+
+//       🎟 6. Promotional Offers & Trials
+app.use('/',createPromo)
+app.use('/',editPromo)
+
+//      🔔 7. Notifications Manager
+app.use('/',appToast)
+app.use('/',getToast)
+app.use('/',editToast)
+app.use('/',weeklyDigest)
+app.use('/',planExpiry)
+app.use('/',usesReminder)
+
 
 app.listen(process.env.PORT,()=>{
     console.log("server start")

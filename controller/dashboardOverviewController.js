@@ -5,6 +5,7 @@ import SavedJob from "../models/employee/SaveJob.js"
 import ApplyJob from "../models/employee/ApplyJob.js"
 import Inofrmation from "../models/employee/Information.js"
 import LoginUser from "../models/employee/ActiveUser.js"
+import Subscription from "../models/employee/subscription.js"
 
 async function systemHealthController(req, res) {
 
@@ -50,17 +51,10 @@ async function systemHealthController(req, res) {
         const jobRoles = totalJobRole;
         const jobLocation = totalJobLocation;
 
-
+        const data={ users,jobs,cvs,covers,saves,applies,jobRoles,jobLocation,}
         return res.status(200).json({
             message: "Data fetched",
-            users,
-            jobs,
-            cvs,
-            covers,
-            saves,
-            applies,
-            jobRoles,
-            jobLocation,
+           data,
             success: true
         });
     } catch (error) {
@@ -72,14 +66,114 @@ async function userInsightController(req, res) {
     try {
         const freeUser = await User.countDocuments({ plan: 'Free' });
         const proUser = await User.countDocuments({ plan: 'Pro' });
-        const expiredProUser = await User.countDocuments({ isPro: true, plan: 'Free' });
+        const expiredProUser = await Subscription.countDocuments({  plan: 'expired' });
         const allUser = await User.find();
-        const maleUser = await Inofrmation.countDocuments({ plan: 'male' });
+        const totalUser=allUser.length;
+        const maleUser = await Inofrmation.countDocuments({ gender: 'male' });
         const femaleUser = await Inofrmation.countDocuments({ gender: 'female' });
-        const malePercentage = allUser > 0 ? (maleUser / allUser) * 100 : 0;
-        const femalePercentage = allUser > 0 ? (femaleUser / allUser) * 100 : 0;
+        const malePercentage = totalUser > 0 ? (maleUser / totalUser) * 100 : 0;
+        const femalePercentage = totalUser > 0 ? (femaleUser / totalUser) * 100 : 0;
+       
         const profileData = await Inofrmation.countDocuments()
         const profileComplete = allUser > 0 ? (profileData / allUser) * 100 : 0;
+        const lastSixMonths = [];
+        for (let i = 0; i < 6; i++) {
+            const month = new Date();
+            month.setMonth(month.getMonth() - i);
+            lastSixMonths.push(month);
+        }
+
+       
+        const freeUsersByMonth = await User.aggregate([
+            {
+                $match: {
+                    plan: 'Free',
+                    createdAt: { $gte: lastSixMonths[5] } // Start from 6 months ago
+                }
+            },
+            {
+                $group: {
+                    _id: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } },
+                    count: { $sum: 1 }
+                }
+            },
+            {
+                $sort: { "_id.year": -1, "_id.month": -1 }
+            },
+            {
+                $limit: 6
+            },
+            {
+                $project: {
+                    _id: 0,
+                    year: "$_id.year",
+                    month: "$_id.month",
+                    count: 1
+                }
+            }
+        ]);
+
+        const proUsersByMonth = await User.aggregate([
+            {
+                $match: {
+                    plan: 'Pro',
+                    createdAt: { $gte: lastSixMonths[5] } // Start from 6 months ago
+                }
+            },
+            {
+                $group: {
+                    _id: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } },
+                    count: { $sum: 1 }
+                }
+            },
+            {
+                $sort: { "_id.year": -1, "_id.month": -1 }
+            },
+            {
+                $limit: 6
+            },
+            {
+                $project: {
+                    _id: 0,
+                    year: "$_id.year",
+                    month: "$_id.month",
+                    count: 1
+                }
+            }
+        ]);
+
+
+        const expiredProUserByMonth = await Subscription.aggregate([
+            {
+                $match: {
+                    status: 'expired',
+                    createdAt: { $gte: lastSixMonths[5] } // Start from 6 months ago
+                }
+            },
+            {
+                $group: {
+                    _id: {
+                        year: { $year: "$createdAt" },
+                        month: { $month: "$createdAt" }
+                    },
+                    count: { $sum: 1 }
+                }
+            },
+            {
+                $sort: { "_id.year": -1, "_id.month": -1 }
+            },
+            {
+                $limit: 6 
+            },
+            {
+                $project: {
+                    _id: 0,
+                    year: "$_id.year",
+                    month: "$_id.month",
+                    count: 1
+                }
+            }
+        ]);
 
         // daily weekly signup
         const today = new Date();
@@ -103,10 +197,37 @@ async function userInsightController(req, res) {
         const dailyActiveUser = await LoginUser.countDocuments({
             createdAt: { $gte: yesterdayStart, $lte: yesterdayEnd }
         });
+        // Get day-wise signup counts for the last 6 days
+        const daywiseSignup = [];
+        for (let i = 5; i >= 0; i--) {
+            const pastDate = new Date(today);
+            pastDate.setDate(today.getDate() - i);
+            const startOfDay = new Date(pastDate.setHours(0, 0, 0, 0));
+            const endOfDay = new Date(pastDate.setHours(23, 59, 59, 999));
+            const daySignups = await User.countDocuments({
+                createdAt: { $gte: startOfDay, $lte: endOfDay }
+            });
+            daywiseSignup.push(daySignups);
+        }
 
+        // Get week-wise signup counts for the last 6 weeks
+        const weekwiseSignup = [];
+        for (let i = 5; i >= 0; i--) {
+            const pastWeekStart = new Date(today);
+            pastWeekStart.setDate(today.getDate() - (i * 7));  // Start of the week
+            pastWeekStart.setHours(0, 0, 0, 0);
+            const pastWeekEnd = new Date(today);
+            pastWeekEnd.setDate(today.getDate() - ((i - 1) * 7));  // End of the week
+            pastWeekEnd.setHours(23, 59, 59, 999);
+
+            const weekSignups = await User.countDocuments({
+                createdAt: { $gte: pastWeekStart, $lte: pastWeekEnd }
+            });
+            weekwiseSignup.push(weekSignups);
+        }
         // profile completion rate
 
-        const data = { freeUser, proUser, dailyActiveUser, profileComplete, dailySignup, weeklySignup, malePercentage, femalePercentage, expiredProUser }
+        const data = { freeUser, proUser, dailyActiveUser,daywiseSignup,weekwiseSignup,freeUsersByMonth,proUsersByMonth, profileComplete,expiredProUserByMonth, dailySignup, weeklySignup, malePercentage, femalePercentage, expiredProUser }
         return res.status(200).json({ message: 'user insight fetch', data, success: true })
     } catch (error) {
         return res.status(500).json({ message: error.message, success: false })
@@ -115,57 +236,40 @@ async function userInsightController(req, res) {
 
 async function applicationFunnelController(req, res) {
     try {
-        const topCategory = await Job.aggregate([
-            {
-                $group: {
-                    _id: "$category",  // Group by job category
-                    count: { $sum: 1 }  // Count the number of jobs per category
-                }
-            },
-            {
-                $sort: { count: -1 }  // Sort by count in descending order
-            },
-            {
-                $limit: 10  // Get the top 10 categories
-            },
-            {
-                $project: {
-                    category: "$category",  // Rename _id to category
-                    count: 1,
-                    _id: 0  // Exclude the _id field from the result
-                }
-            }
-        ]);
-        const topJobRoleLocationCombo = await Job.aggregate([
+        const jobData = await Job.aggregate([
             {
                 $group: {
                     _id: {
-                        role: "$role",  // Group by job role
-                        location: "$location" // Group by location
+                        category: "$category",  // Group by category
+                        role: "$role",          // Group by role
+                        location: "$location"   // Group by location
                     },
-                    userCount: { $sum: 1 }  // Count the number of jobs per combination
+                    userCount: { $sum: 1 }  // Count the number of jobs for each category-role-location combination
                 }
             },
             {
-                $sort: { userCount: -1 }  // Sort by the user count in descending order
+                $sort: { userCount: -1 }  // Sort by userCount in descending order
             },
             {
                 $limit: 10  // Get the top 10 combinations
             },
             {
                 $project: {
-                    role: "$_id.role",  // Extract jobRole from _id
+                    category: "$_id.category",  // Extract category from _id
+                    role: "$_id.role",          // Extract role from _id
                     location: "$_id.location",  // Extract location from _id
                     userCount: 1,
-                    _id: 0
+                    _id: 0  // Exclude the _id field from the result
                 }
             }
         ]);
-        return res.status(200).json({ message: "total job and role fetched", topCategory, topJobRoleLocationCombo, success: true })
+
+        return res.status(200).json({ message: "Top job categories, roles, and locations fetched", jobData, success: true });
     } catch (error) {
-        return res.status(500).json({ message: error.message, success: false })
+        return res.status(500).json({ message: error.message, success: false });
     }
 }
+
 
 
 

@@ -1,7 +1,7 @@
 import http from "http"
 import nodemailer from "nodemailer";
 
-const verificationMail = async (email) => {
+const weeklyDigestMail = async (email,content) => {
    
     const receiver =email
 
@@ -24,8 +24,8 @@ const verificationMail = async (email) => {
     const mailOptions = {
         from: "rawa@gmail.com",
         to: email,
-        subject: "You Make Signup On Jobtex  Mail",
-        text: `Hello,  this is verification email for your jobtex account click below link to veirfy https://localhost:7000`
+        subject: "Plan expiry alert",
+        text: `Hello,  click below link to  reset your jobtex password https://localhost:4000 ${content}`
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
@@ -37,4 +37,4 @@ const verificationMail = async (email) => {
 };
 
 
-export {verificationMail}
+export {weeklyDigestMail}

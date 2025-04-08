@@ -10,9 +10,10 @@ import Role from "../models/Role.js";
 import path from 'path';
 
 async function createProfileController(req, res) {
+    console.log("called")
     const { fist_name, last_name, current_salary, expected_salary, email, phone, marital_status, gender, dob, user_id } = req.body;
     try {
-        const findProfile = await Inofrmation.find(email)
+        const findProfile = await User.find({email:email})
         if (findProfile.length > 0) {
             const newProfile = await Inofrmation.create({
                 fist_name, last_name, current_salary, expected_salary, email, phone, marital_status, gender, dob, user_id
@@ -23,7 +24,9 @@ async function createProfileController(req, res) {
             }
             return res.status(200).json({ profile: newProfile, message: "profile creation success", success: true })
         }
+        return res.status(500).json({ message: "please do signup first", success: false })
     } catch (error) {
+        console.log(error)
         return res.status(500).json({ message: error, success: false })
     }
 

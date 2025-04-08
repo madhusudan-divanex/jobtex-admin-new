@@ -51,3 +51,29 @@ social url
 
 //      dashboard overview->profile completion rate
 //      user management ->generated cv 
+
+🎟 6. Promotional Offers & Trials
+Enable limited-time campaigns and incentives.
+    • Create and manage:
+        ◦ Promo codes (discount % or free Pro duration)
+    • Set:
+        ◦ Usage limits per user / overall
+        ◦ Expiry dates
+        ◦ Promo descriptions (for email/banner usage)
+        
+🔔 7. Notifications Manager
+Create system-wide or targeted notifications.
+    • In-app toast or banner notifications:
+        ◦ Feature releases
+        ◦ System downtime alerts
+        ◦ Tips & onboarding nudges
+    • Email notifications:
+        ◦ Weekly digest
+        ◦ Usage reminders
+        ◦ Plan expiry alerts
+
+
+Frontend
+notification add,promocode adding,userlist,create update get delete on signup and plan,
+dashboard card and type of user and daily and Weekly signup data dynamic ,top 10 category 
+

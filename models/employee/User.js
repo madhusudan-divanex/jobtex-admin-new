@@ -33,7 +33,7 @@ const userSchema = new Schema({
         required: [true, 'Password is required'],
         minlength: [6, 'Password must be at least 6 characters long'], 
     },
-    acccount_satus:{
+    account_status:{
          type: String,
         default:'active'
     },
