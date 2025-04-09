@@ -9,37 +9,43 @@ async function userListController(req, res) {
     try {
         // const generalDetail=await User.find()
         // const informationDetail=await Inofrmation.find()
-        const mergeData=await User.aggregate([
+        const mergeData = await User.aggregate([
             {
                 $lookup: {
-                    from: "information",  // The name of the collection (make sure it matches the actual collection name)
-                    localField: "_id",  // The field in the User collection (usually _id)
-                    foreignField: "user_id",  // The field in the Cv collection that references User (assuming it's userId)
-                    as: "userInformation"  // Alias for the Cv data
+                    from: "login_users", 
+                    let: { userId: "$_id" }, 
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: { $eq: ["$user_id", "$$userId"] } 
+                            }
+                        }
+                    ],
+                    as: "lastActive"  // This will contain the matched data
                 }
             },
             {
                 $lookup: {
-                    from: "login user",  
-                    localField: "_id", 
-                    foreignField: "user_id",  
-                    as: "lastActive" 
-                }
-            },
-            
-            {
-                $unwind: {
-                    path: "$userInformation",
-                    preserveNullAndEmptyArrays: true 
+                    from: "information",  // The name of the information collection
+                    localField: "_id",    // The field to join from the User collection (ObjectId)
+                    foreignField: "user_id",  // The field in the information collection to join (ObjectId)
+                    as: "userInformation"  // Alias for the user information
                 }
             },
             {
                 $unwind: {
-                    path: "$lastActive",
-                    preserveNullAndEmptyArrays: true 
+                    path: "$userInformation",  // Unwind the userInformation array
+                    preserveNullAndEmptyArrays: true  // Keep the array even if there are no matches
                 }
             },
-        ])
+            {
+                $unwind: {
+                    path: "$lastActive",  // Unwind the lastActive array
+                    preserveNullAndEmptyArrays: true  // Keep the array even if there are no matches
+                }
+            }
+        ]);
+     
         return res.status(200).json({ message: 'data fetched',data:mergeData, success: true })
     } catch (error) {
         return res.status(500).json({ message: error.message, success: false })

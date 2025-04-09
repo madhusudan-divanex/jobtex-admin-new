@@ -51,7 +51,7 @@ async function getEmployeePlanController(req, res) {
         const standardEmployees=await User.countDocuments({ plan: 'Standard' });
         const ultraEmployees=await User.countDocuments({ plan: 'Pro' });
         const totalUsers=freeEmployees+standardEmployees+ultraEmployees
-        console.log(totalUsers)
+        // console.log(totalUsers)
        
         
         return res.status(200).json({ freeEmployees,standardEmployees,ultraEmployees,totalUsers, message: "Employee Fetched", success: true });

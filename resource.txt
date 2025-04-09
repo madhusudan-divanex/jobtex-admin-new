@@ -51,13 +51,16 @@ social url
 
 Frontend
 Dashboard->
+    Job Category Table
     Expire Pro user dynamic
     Sign up dynamic 
     Daily Active User dynamic
     Profile Complete dynamic
+Notification->
     Update Notification
     Notification table
     Delete Notification
+PromoCode->
     Update promocode
     promocode table
     Delete promocode
@@ -71,3 +74,6 @@ Backend->
     Update Notification Api
     Delete Notification Api
     
+Frontend->dynamic Graph,CRUD on Notification and promocode
+Backend->CRUD on Promo code and Notification and Modify api
+ 
