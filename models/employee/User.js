@@ -20,7 +20,7 @@ const userSchema = new Schema({
     } ,
     isPro: {
         type: Boolean,
-        default:true
+        default:false
     },
     email: {
         type: String,

@@ -9,15 +9,15 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { createReport, getAllReport, getReportById } from './routes/report.js';
 import { adminLogin, getEmployeeAll, planEmployee } from './routes/admin/Login.js';
-import { createDetail, createProfile, deleteCv, getEmployeeData, updateCv, uploadCv } from './routes/employees.js';
+import { buyPlan, createDetail, createProfile, deleteCv, getEmployeeData, updateCv, uploadCv } from './routes/employees.js';
 import { verifyToken } from './routes/verify-route.js';
 import { createPlan, deletePlan, getPlan, updatePlan } from './routes/admin/Plan.js';
 import { createStaff, deleteStaff, getStaff, getStaffById, updateStaff } from './routes/admin/Staff.js';
 import { applicationFunnel, systemHealth, userInsight } from './routes/admin/dashboardOverview.js';
 import { grantPro, userAction, userDetail, userList } from './routes/admin/userManagement.js';
 import { perUserActivity, systemWiseLog } from './routes/admin/userActivityLogs.js';
-import { appToast, editToast, getToast, planExpiry, usesReminder, weeklyDigest } from './routes/admin/notificationsManager.js';
-import { createPromo, editPromo } from './routes/admin/promoTrials.js';
+import { appToast, deleteToast, editToast, getToast, planExpiry, usesReminder, weeklyDigest } from './routes/admin/notificationsManager.js';
+import { createPromo, deletePromo, editPromo, getPromo } from './routes/admin/promoTrials.js';
 
 const app=express()
 dotenv.config();
@@ -42,6 +42,7 @@ app.use('/',forgotPass)
 app.use('/',createProfile)
 app.use('/',getEmployeeData)
 app.use('/',createDetail)
+app.use('/',buyPlan)
 app.use('/',uploadCv)
 app.use('/',updateCv)
 app.use('/',deleteCv)
@@ -98,12 +99,15 @@ app.use('/',systemWiseLog)
 
 //       🎟 6. Promotional Offers & Trials
 app.use('/',createPromo)
+app.use('/',getPromo)
 app.use('/',editPromo)
+app.use('/',deletePromo)
 
 //      🔔 7. Notifications Manager
 app.use('/',appToast)
 app.use('/',getToast)
 app.use('/',editToast)
+app.use('/',deleteToast)
 app.use('/',weeklyDigest)
 app.use('/',planExpiry)
 app.use('/',usesReminder)

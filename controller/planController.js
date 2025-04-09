@@ -1,7 +1,7 @@
 import Plan from "../models/Plan.js";
 
 async function createPlanController(req,res) {
-    console.log("called")
+   
     const {name,price_of_month,price_of_year,feature}=req.body;
     try {
         const newPlan=await Plan.create({

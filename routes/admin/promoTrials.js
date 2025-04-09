@@ -1,11 +1,17 @@
 import express from 'express'
 import verify from '../../middleware/verify.js';
-import { createPromoController, editPromoController } from '../../controller/promoTrialsContorller.js';
+import { createPromoController, deletePromoController, editPromoController, getPromoController } from '../../controller/promoTrialsContorller.js';
 
 const createPromo=express.Router();
 createPromo.post('/create-promo',verify,createPromoController)
 
-const editPromo=express.Router();
-editPromo.post('/edit-promo',verify,editPromoController)
+const getPromo=express.Router();
+getPromo.get('/get-promo',verify,getPromoController)
 
-export {createPromo,editPromo}
+const editPromo=express.Router();
+editPromo.post('/update-promo',verify,editPromoController)
+
+const deletePromo=express.Router();
+deletePromo.delete('/delete-promo/:id',verify,deletePromoController)
+
+export {createPromo,getPromo,editPromo,deletePromo}

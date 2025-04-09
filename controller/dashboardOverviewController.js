@@ -6,6 +6,7 @@ import ApplyJob from "../models/employee/ApplyJob.js"
 import Inofrmation from "../models/employee/Information.js"
 import LoginUser from "../models/employee/ActiveUser.js"
 import Subscription from "../models/employee/subscription.js"
+import moment from "moment"
 
 async function systemHealthController(req, res) {
 
@@ -51,10 +52,10 @@ async function systemHealthController(req, res) {
         const jobRoles = totalJobRole;
         const jobLocation = totalJobLocation;
 
-        const data={ users,jobs,cvs,covers,saves,applies,jobRoles,jobLocation,}
+        const data = { users, jobs, cvs, covers, saves, applies, jobRoles, jobLocation, }
         return res.status(200).json({
             message: "Data fetched",
-           data,
+            data,
             success: true
         });
     } catch (error) {
@@ -66,14 +67,14 @@ async function userInsightController(req, res) {
     try {
         const freeUser = await User.countDocuments({ plan: 'Free' });
         const proUser = await User.countDocuments({ plan: 'Pro' });
-        const expiredProUser = await Subscription.countDocuments({  plan: 'expired' });
+        const expiredProUser = await Subscription.countDocuments({ status: 'expired' });
         const allUser = await User.find();
-        const totalUser=allUser.length;
+        const totalUser = allUser.length;
         const maleUser = await Inofrmation.countDocuments({ gender: 'male' });
         const femaleUser = await Inofrmation.countDocuments({ gender: 'female' });
         const malePercentage = totalUser > 0 ? (maleUser / totalUser) * 100 : 0;
         const femalePercentage = totalUser > 0 ? (femaleUser / totalUser) * 100 : 0;
-       
+
         const profileData = await Inofrmation.countDocuments()
         const profileComplete = totalUser > 0 ? parseFloat(((profileData / totalUser) * 100).toFixed(2)) : 0;
 
@@ -81,10 +82,22 @@ async function userInsightController(req, res) {
         for (let i = 0; i < 6; i++) {
             const month = new Date();
             month.setMonth(month.getMonth() - i);
+            month.setDate(1);  // Ensure we're at the start of the month
             lastSixMonths.push(month);
         }
+        const lastSixMonthsExpire = [];
+        for (let i = 0; i < 6; i++) {
+            const month = new Date();
+            month.setMonth(month.getMonth() - i);
+            month.setDate(1);  // Ensure we're at the start of the month
+            // lastSixMonths.push(month);
+            lastSixMonthsExpire.push({
+                year: month.getFullYear(),
+                month: month.getMonth() + 1, // month is 0-indexed, so we add 1 to it
+              });
+        }
 
-       
+
         const freeUsersByMonth = await User.aggregate([
             {
                 $match: {
@@ -142,21 +155,20 @@ async function userInsightController(req, res) {
                 }
             }
         ]);
-
-
+        const monthNames = [
+            "January", "February", "March", "April", "May", "June", 
+            "July", "August", "September", "October", "November", "December"
+          ];
         const expiredProUserByMonth = await Subscription.aggregate([
             {
                 $match: {
                     status: 'expired',
-                    createdAt: { $gte: lastSixMonths[5] } // Start from 6 months ago
+                    end_date: { $gte: lastSixMonths[5] } 
                 }
             },
             {
                 $group: {
-                    _id: {
-                        year: { $year: "$createdAt" },
-                        month: { $month: "$createdAt" }
-                    },
+                    _id: { year: { $year: "$end_date" }, month: { $month: "$end_date" } },
                     count: { $sum: 1 }
                 }
             },
@@ -164,7 +176,7 @@ async function userInsightController(req, res) {
                 $sort: { "_id.year": -1, "_id.month": -1 }
             },
             {
-                $limit: 6 
+                $limit: 6
             },
             {
                 $project: {
@@ -175,7 +187,41 @@ async function userInsightController(req, res) {
                 }
             }
         ]);
+        const expireResult = lastSixMonthsExpire.map((month) => {
+            const found = expiredProUserByMonth.find(
+              (data) => data.year === month.year && data.month === month.month
+            );
+            return found ? { ...found, month: monthNames[found.month - 1] } : { year: month.year, month: monthNames[month.month - 1], count: 0 };
+          });
+         
+          let profileCompleteData = [];
 
+          for (let i = 5; i >= 0; i--) {
+            const start = moment().subtract(i, 'months').startOf('month').toDate();
+            const end = moment().subtract(i, 'months').endOf('month').toDate();
+          
+            // Step 1: Get all users created this month
+            const users = await User.find({ createdAt: { $gte: start, $lte: end } }).select('_id');
+          
+            const userIds = users.map(user => user._id);
+            const totalUsers = userIds.length;
+          
+            // Step 2: Count profile info matching those users
+            const completedProfiles = await Inofrmation.countDocuments({ user_id: { $in: userIds } });
+          
+            // Step 3: Calculate percentage
+            const percentage = totalUsers > 0 ? parseFloat(((completedProfiles / totalUsers) * 100).toFixed(2)) : 0;
+          
+            profileCompleteData.push({
+              month: moment(start).format('MMM YYYY'),
+              totalUsers,
+              completedProfiles,
+              percentage
+            });
+          }
+          
+          
+          
         // daily weekly signup
         const today = new Date();
         const oneWeekAgo = new Date(today);
@@ -186,18 +232,33 @@ async function userInsightController(req, res) {
         const yesterdayEnd = new Date(today);
         yesterdayEnd.setDate(today.getDate() - 1);
         yesterdayEnd.setHours(23, 59, 59, 999);
-        const weeklySignup = await User.find({
-            createdAt: { $gte: oneWeekAgo }
-        });
-        const dailySignup = await User.find({
-            createdAt: { $gte: yesterdayStart, $lte: yesterdayEnd }
-        });
-
+       
         // daily active user
-        // daily active users
-        const dailyActiveUser = await LoginUser.countDocuments({
-            createdAt: { $gte: yesterdayStart, $lte: yesterdayEnd }
-        });
+        const result = [];
+
+     
+        for (let i = 0; i < 7; i++) {
+            const startOfDay = new Date(today);
+            startOfDay.setDate(today.getDate() - i);
+            startOfDay.setHours(0, 0, 0, 0);  
+
+            const endOfDay = new Date(today);
+            endOfDay.setDate(today.getDate() - i);
+            endOfDay.setHours(23, 59, 59, 999);  
+
+            
+            const activeUserCount = await LoginUser.countDocuments({
+                createdAt: { $gte: startOfDay, $lte: endOfDay }
+            });
+
+            
+            const dayLabel = i === 0 ? "Today" : (i === 1 ? "Yesterday" : `Day ${i} ago`);
+            result.push({ day: dayLabel, activeUsers: activeUserCount });
+        }
+
+      
+        
+
         // Get day-wise signup counts for the last 6 days
         const daywiseSignup = [];
         for (let i = 5; i >= 0; i--) {
@@ -227,8 +288,9 @@ async function userInsightController(req, res) {
             weekwiseSignup.push(weekSignups);
         }
         // profile completion rate
+        const dailyActiveUser=result
 
-        const data = { freeUser, proUser, dailyActiveUser,daywiseSignup,weekwiseSignup,freeUsersByMonth,proUsersByMonth, profileComplete,expiredProUserByMonth, dailySignup, weeklySignup, malePercentage, femalePercentage, expiredProUser }
+        const data = { freeUser, proUser, dailyActiveUser, daywiseSignup, weekwiseSignup,profileCompleteData, freeUsersByMonth, proUsersByMonth, profileComplete, expireResult,  malePercentage, femalePercentage, expiredProUser }
         return res.status(200).json({ message: 'user insight fetch', data, success: true })
     } catch (error) {
         return res.status(500).json({ message: error.message, success: false })

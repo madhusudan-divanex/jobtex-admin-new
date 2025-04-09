@@ -8,6 +8,7 @@ import User from "../models/employee/User.js";
 import fs from 'fs';
 import Role from "../models/Role.js";
 import path from 'path';
+import Subscription from "../models/employee/subscription.js";
 
 async function createProfileController(req, res) {
     console.log("called")
@@ -215,6 +216,29 @@ async function updateDetailController(req, res) {
     }
 }
 
+async function buyPlanController(req, res) {
+    console.log("called")
+    const { subscription_id,start_date,end_date,status,user_id } = req.body;
+    try {
+        const findUser = await Subscription.find({user_id:user_id})
+        if (findUser.length > 0) {
+            await Subscription.deleteONe({user_id:user_id})
+        }
+        const newSubscription = await Subscription.create({
+            subscription_id,start_date,end_date,status,user_id
+        })
+
+        if (!newSubscription) {
+            return res.status(500).json({ message: "subscription creation failed", success: false })
+        }
+        return res.status(200).json({ subscription: newSubscription, message: "subscription creation success", success: true })
+        //return res.status(500).json({ message: "please do signup first", success: false })
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ message: error, success: false })
+    }
+
+}
 
 async function uploadCvController(req,res) {
     const {user_id,cv_file,cover_file}=req.body;
@@ -308,4 +332,4 @@ async function deleteCvController(req, res) {
     }
 }
 
-export { createProfileController,getEmployeedataController,createDetailController,uploadCvController,updateCvController,deleteCvController }
+export { createProfileController,getEmployeedataController,createDetailController,buyPlanController,uploadCvController,updateCvController,deleteCvController }
