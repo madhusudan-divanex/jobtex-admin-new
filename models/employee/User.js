@@ -18,6 +18,10 @@ const userSchema = new Schema({
         type: String,
         default:'Free'
     } ,
+    isVerify: {
+        type: Boolean,
+        default:false
+    },
     isPro: {
         type: Boolean,
         default:false

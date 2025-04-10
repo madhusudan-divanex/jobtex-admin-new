@@ -9,24 +9,33 @@ async function loginController(req,res) {
     try {
         const existUser=await User.findOne({email})
         if(existUser){
-            if(bcrypt.compare(password,existUser.password)){
-                jwt.sign({existUser},process.env.SECRET_KEY,{expiresIn:'1d'},async(err,token)=>{
-                    if(err){
-                        return res.status(200).json({message:'error in token genertaion',success:false})
-                    }
-                    const findLogin=await LoginUser.find({_id:existUser._id})
-                    if(findLogin){
-                        await LoginUser.deleteOne(existUser._id)
-                    }
-                    const addLogin=await LoginUser.create({
-                        user_id:existUser._id
-                    })
-                    return res.status(200).json({token,message:"login success",user:existUser,success:true})
-                })   
+            if(existUser.isVerify){
+                console.log(bcrypt.compare(password,existUser.password))
+                if(bcrypt.compare(password,existUser.password)){
+                    jwt.sign({existUser},process.env.SECRET_KEY,{expiresIn:'1d'},async(err,token)=>{
+                        if(err){
+                            return res.status(200).json({message:'error in token genertaion',success:false})
+                        }
+                        const findLogin=await LoginUser.find({_id:existUser._id})
+                        if(findLogin){
+                            await LoginUser.deleteOne(existUser._id)
+                        }
+                        const addLogin=await LoginUser.create({
+                            user_id:existUser._id
+                        })
+                        return res.status(200).json({token,message:"login success",user:existUser,success:true})
+                    })   
+                }
+                else{
+                    return res.status(400).json({token,message:"Password not match",success:false})
+                }
+            }else{
+                return res.status(400).json({message:"user not found",success:false})
             }
         }
         
     } catch (error) {
+        console.log(error)
         return res.status(500).json({message:error,success:false})
     }
 }
@@ -35,7 +44,14 @@ async function signUpController(req,res) {
     try {
         const existUser=await User.findOne({email})
         if(existUser){            
-            return res.status(200).json({message:'user already exist',success:false})
+            if(!existUser.isVerify){
+                await User.findOneAndDelete({email:email})
+                
+            }
+            else
+            {
+                return res.status(200).json({message:'user already exist',success:false})
+            }
         }
         const hashpassword=await bcrypt.hash(password,10)
         const newUser=await User.create({
@@ -48,44 +64,60 @@ async function signUpController(req,res) {
         if (!newUser) {
             return res.status(400).json({ message: "Signup failed", success: false });
         }
-        const response=await verificationMail(email)
-        if(response =="Failed to send email"){
-            console.log("not sent")
-        }
-        else{
-            console.log("sent",response)
-        }
-        return res.status(200).json({token,message:"account created",user:newUser,success:true})
+        const user_id=newUser._id
+        await verificationMail(email,user_id)
+      
+        return res.status(200).json({message:"account created",user:newUser,success:true})
         
     } catch (error) {
         if (error.name === 'ValidationError') {
             return res.status(400).json({ message: error.message, success: false });
         }
-        return res.status(500).json({message:error,success:false})
-    }
-}
-async function resetController(req,res) {
-    const {email,password}=req.body;
-    try {
-        const existUser=await User.findOne({email})
-        if(existUser){
-            const hashpassword=bcrypt.hash(password,10)
-            existUser.password=hashpassword
-            existUser.save()
-            return res.status(200).json({token,message:"password rest",success:true})
-        }
-    } catch (error) {
-        return res.status(500).json({message:error,success:false})
-    }
-}
-async function forgotController(req,res) {
-    const {email}=req.body;
-    try {
-       await forgotMail(email)
-        return res.status(200).json({message:"mail sent",success:true})      
-    } catch (error) {
+        console.log(error)
         return res.status(500).json({message:error,success:false})
     }
 }
 
-export {loginController,signUpController,forgotController,resetController}
+async function profileVerifyController(req,res) {
+    
+    const id=req.params;
+    try {
+        
+        await verificationMail(id)
+        return res.status(200).json({message:"mail sent",success:true})      
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({message:error,success:false})
+    }
+}
+
+async function resetController(req,res) {
+    const {user_id,password}=req.body;
+    try {
+        const existUser=await User.findOne({_id:user_id})
+        if(existUser){
+            const hashpassword=await bcrypt.hash(password,10)
+            existUser.password=hashpassword
+            existUser.save()
+            return res.status(200).json({message:"password rest",success:true})
+        }
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({message:error,success:false})
+    }
+}
+async function forgotController(req,res) {
+    console.log(req.body)
+    const {email}=req.body;
+    try {
+        const findUser=await User.findOne({email})
+        const user_id=findUser._id
+        await forgotMail(email,user_id)
+        return res.status(200).json({message:"mail sent",success:true})      
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({message:error,success:false})
+    }
+}
+
+export {loginController,signUpController,profileVerifyController,forgotController,resetController}

@@ -33,6 +33,7 @@ async function getToastController(req,res) {
 
 async function editToastController(req,res) {
     const {id,name,type,status,content,target_by}=req.body
+    
     try {
         const editToast=await AppToast.findByIdAndUpdate(id,{
             name,type,content,status,content,target_by

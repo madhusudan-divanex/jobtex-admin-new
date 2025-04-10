@@ -1,16 +1,19 @@
 import express from 'express'
-import { forgotController, loginController, resetController, signUpController } from '../controller/loginandsignupController.js';
+import { forgotController, loginController, profileVerifyController, resetController, signUpController } from '../controller/loginandsignupController.js';
 
 const signup=express.Router();
 signup.post('/create-account',signUpController)
 
 const login=express.Router()
-login.post('/login',loginController)
+login.post('/user-login',loginController)
+
+const profileVeirfy=express.Router()
+profileVeirfy.post('/user-profile-verify/:id',profileVerifyController)
 
 const forgotPass=express.Router()
 forgotPass.post('/forgot-password',forgotController)
 
 const resetPass=express.Router()
-resetPass.put('/reset-password',resetController)
+resetPass.post('/reset-password',resetController)
 
-export {signup,login,forgotPass,resetPass}
+export {signup,login,profileVeirfy,forgotPass,resetPass}

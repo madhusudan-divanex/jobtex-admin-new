@@ -2,8 +2,8 @@ import mongoose, { Schema } from 'mongoose';
 
 
 const certificationSchema = new Schema({
-    // certification_name:String,
-    certification_url :String,
+    certification_name:String,
+    // certification_url :String,
     user_id: {
             type: mongoose.Schema.Types.ObjectId,  
             ref: 'user',

@@ -11,13 +11,14 @@ import path from 'path';
 import Subscription from "../models/employee/subscription.js";
 
 async function createProfileController(req, res) {
-    console.log("called")
-    const { fist_name, last_name, current_salary, expected_salary, email, phone, marital_status, gender, dob, user_id } = req.body;
+    // console.log("called",req.body)
+    const { first_name, last_name, current_salary,cs_currency, expected_salary,es_currency, email, phone, marital_status, gender, dob, user_id } = req.body;
     try {
         const findProfile = await User.find({email:email})
         if (findProfile.length > 0) {
+            const verifyProfile=await User.findByIdAndUpdate({_id:user_id},{isVerify:true},{new:true})
             const newProfile = await Inofrmation.create({
-                fist_name, last_name, current_salary, expected_salary, email, phone, marital_status, gender, dob, user_id
+                first_name, last_name, current_salary,cs_currency, expected_salary,es_currency,email, phone, marital_status, gender, dob, user_id
             })
 
             if (!newProfile) {
@@ -58,83 +59,83 @@ async function getEmployeedataController(req, res) {
     }
 }
 async function createDetailController(req, res) {
-    const { user_id } = req.body;
-    const { educationForm, experienceForm, certificationForm, languageForm ,skillForm} = req.body;
-    try {
+    console.log(req.body);
+    
+    const { educationForm, workExperienceForm, certificationForm, languageForm, skillForm } = req.body;
+    const user_id = educationForm[0]?.user_id; // Assuming that user_id is in the first element of educationForm
 
-        const findUser = await User.findOne({ _id: user_id })
+    try {
+        const findUser = await User.findOne({ _id: user_id });
         if (!findUser) {
-            return res.status(404).json({ message: "user not found", success: false });
+            return res.status(404).json({ message: "User not found", success: false });
         }
+
         let isEducation = false;
         let isExperience = false;
         let isCertification = false;
         let isLanguage = false;
-        let isSkill=false;
+        let isSkill = false;
 
-        if (educationForm.length > 0) {
-            isEducation = true;
-        }
-        if (experienceForm.length > 0) {
-            isExperience = true
-        }
-        if (certificationForm.length > 0) {
-            isCertification = true;
-        }
-        if (languageForm.length > 0) {
-            isLanguage = true
-        }
-        if(skillForm.length>0){
-            isSkill=true
-        }
+        // Check if there is any data in the form arrays
+        if (educationForm.length > 0) isEducation = true;
+        if (workExperienceForm.length > 0) isExperience = true;
+        if (certificationForm.length > 0) isCertification = true;
+        if (languageForm.length > 0) isLanguage = true;
+        if (skillForm.skill.length > 0) isSkill = true; // Corrected here to check skillForm.skill.length
 
+        // Handle education entries
         if (isEducation) {
-
             const educationEntries = educationForm.map(edu => ({
                 ...edu,
                 user_id,
             }));
-
-            const savedEducation = await Education.insertMany(educationEntries);
+            await Education.insertMany(educationEntries);
         }
-        if (isExperience) {
 
-            const experienceEntries = experienceForm.map(exp => ({
+        // Handle work experience entries
+        if (isExperience) {
+            const experienceEntries = workExperienceForm.map(exp => ({
                 ...exp,
                 user_id,
             }));
-
-            const savedExperience = await Experience.insertMany(experienceEntries);
+            await Experience.insertMany(experienceEntries);
         }
-        if (isCertification) {
 
+        // Handle certification entries
+        if (isCertification) {
             const certificationEntries = certificationForm.map(cer => ({
                 ...cer,
                 user_id,
             }));
-
-            const savedCertification = await Certification.insertMany(certificationEntries);
+            await Certification.insertMany(certificationEntries);
         }
-        if (isLanguage) {
 
+        // Handle language entries
+        if (isLanguage) {
             const languageEntries = languageForm.map(lan => ({
                 ...lan,
                 user_id,
             }));
-
-            const savedlanguage = await Language.insertMany(languageEntries);
-        }
-        if(isSkill){
-            const addSkill=await User.findByIdAndUpdate({_id:user_id},{skill:skillForm},{new:true})
+            await Language.insertMany(languageEntries);
         }
 
-        return res.status(200).json({ message: "all added successfully", success: true });
+        // Handle skill updates
+        if (isSkill) {
+            await User.findByIdAndUpdate(
+                { _id: user_id },
+                { $set: { skill: skillForm.skill } }, // Update the skills array
+                { new: true }
+            );
+        }
+
+        return res.status(200).json({ message: "All added successfully", success: true });
 
     } catch (error) {
-        return res.status(500).json({ message: error, success: false })
+        console.error(error);
+        return res.status(500).json({ message: error.message, success: false });
     }
-
 }
+
 
 async function updateDetailController(req, res) {
     const { user_id } = req.body;

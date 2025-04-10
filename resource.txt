@@ -76,4 +76,75 @@ Backend->
     
 Frontend->dynamic Graph,CRUD on Notification and promocode
 Backend->CRUD on Promo code and Notification and Modify api
+
+Frontend
+    TailoredJob Admin->issue fix 
+    TailoredJob User 
+        login
+        forget password
+        reset password
+        create account
+        verification link sent 
+        personal Detail page 
+        manual cv input data
+
+Backend
+🛠 4. API Performance Monitoring
+Understand how backend modules are performing.
+    • Real-time metrics (via dashboard or Prometheus/Grafana integration): 
+        ◦ APIs of Manual Registration.
+        ◦ APIs of CV upload.
+        ◦ APIs of Manual.
+       
+
+💳 5. Subscription & Billing Control
+Adjust pricing, manage plans, and monitor usage.
+    
+    • View current subscribers
+    • Manual upgrade/downgrade
+    • Grant custom plans or one-time top-ups
+
+
+ 
+Module 1: User Onboarding & Job Listings (2 Weeks)
+User Registration & Authentication
+Sign-up/login via Email, Google OAuth, LinkedIn OAuth
+Redirect to profile setup flow after signup
+Profile Setup Flow
+Personal & professional details entry
+ 
+1. CV Parsing from Uploads 
+- User uploads CV (PDF/DOCX format).
+- AI Model (Gemini Flash 2.0) processes the document to extract key details such as:  
+  - Personal Information (Name, Email, Phone, Address)  
+  - Work Experience (Job Titles, Companies, Durations)  
+  - Education (Degrees, Institutions, Years)  
+  - Skills & Certifications  
+- Parsed data is mapped to the user profile fields, allowing the user to review and edit before saving.  
+
+2. LinkedIn Data Extraction 
+- User connects to a LinkedIn account via OAuth API.  
+- Upon authorization, the system fetches:  
+  - Profile Summary (Bio, Headline, Location)  
+  - Experience (Companies, Job Titles, Duration)  
+  - Education & Certifications  
+  - Skills & Endorsements  
+- Extracted data is auto-filled into the user profile, which the admin can access.  
+
+3. Admin Access to Extracted Data  
+- The Admin Panel will have a section to  view, manage, and verify  user profiles.  
+- Admin can fetch details directly from parsed CVs or LinkedIn data.  
+- Admin can edit, approve, or flag  incomplete/inaccurate data.  
+- Reports & analytics can track profile completeness and accuracy  
+
+CV & Cover Letter Templates
+CV template will be provided by the client.
+6 ATS-optimized industry-specific CV & Cover Letter templates
+Downloadable in PDF & Word formats
+Job Preferences & Listings Dashboard
+API integration with LinkedIn, ATS platforms via RapidAPI
+Dynamic job listing updates based on user preferences
+Match Score Algorithm
+Ranking jobs based on relevance, recency, stability, and ease of application
+Basic Admin Panel for User Management
  

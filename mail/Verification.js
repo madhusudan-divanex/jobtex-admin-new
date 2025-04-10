@@ -1,7 +1,8 @@
 import http from "http"
 import nodemailer from "nodemailer";
+import { base_url } from "../baseUrl.js";
 
-const verificationMail = async (email,res) => {
+const verificationMail = async (email,user_id) => {
    
     const receiver =email
 
@@ -17,15 +18,15 @@ const verificationMail = async (email,res) => {
         port: 465,
         auth: {
             user: "rawamansa@gmail.com",
-            pass: "bfcnesqpihgyykxo"
+            pass: "mgbkrjlkhnyugtpl"
         }
     });
 
     const mailOptions = {
         from: "rawa@gmail.com",
         to: email,
-        subject: "You Make Signup On Jobtex  Mail",
-        text: `Hello,  this is verification email for your jobtex account click below link to veirfy https://localhost:7000`
+        subject: "You Make Signup On Tailored-jobz  Mail",
+        text: `Hello,  this is verification email for your Tailored-jobz account click below link to veirfy ${base_url}/personal-details/${user_id}`
     };
 
     transporter.sendMail(mailOptions, (error, info) => {

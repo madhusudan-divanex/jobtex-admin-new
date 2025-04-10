@@ -2,7 +2,7 @@ import mongoose, { Schema } from 'mongoose';
 
 
 const educationSchema = new Schema({
-    education_name:String,
+    
     university_name :String,
     degree_type :String,
     field_of_study:String,

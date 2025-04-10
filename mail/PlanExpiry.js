@@ -1,5 +1,6 @@
 import http from "http"
 import nodemailer from "nodemailer";
+import { base_url } from "../baseUrl.js";
 
 const planExpiryMail = async (email) => {
    
@@ -17,7 +18,7 @@ const planExpiryMail = async (email) => {
         port: 465,
         auth: {
             user: "rawamansa@gmail.com",
-            pass: "bfcnesqpihgyykxo"
+            pass: "mgbkrjlkhnyugtpl"
         }
     });
 
@@ -25,7 +26,7 @@ const planExpiryMail = async (email) => {
         from: "rawa@gmail.com",
         to: email,
         subject: "Plan expiry alert",
-        text: `Hello,  click below link to  reset your jobtex password https://localhost:4000`
+        text: `Hello,  click below link to  reset your jobtex password ${base_url}`
     };
 
     transporter.sendMail(mailOptions, (error, info) => {

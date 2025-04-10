@@ -2,7 +2,7 @@ import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
 import ConnectToDb from './config/dbConfig.js';
-import { forgotPass, login, resetPass, signup } from './routes/loginandsignup.js';
+import { forgotPass, login, profileVeirfy, resetPass, signup } from './routes/loginandsignup.js';
 import { deleteJob, editJob, getAllJob, getJobByCompany, getJobById, newJob } from './routes/jobs.js';
 import fs from 'fs';
 import path from 'path';
@@ -11,13 +11,14 @@ import { createReport, getAllReport, getReportById } from './routes/report.js';
 import { adminLogin, getEmployeeAll, planEmployee } from './routes/admin/Login.js';
 import { buyPlan, createDetail, createProfile, deleteCv, getEmployeeData, updateCv, uploadCv } from './routes/employees.js';
 import { verifyToken } from './routes/verify-route.js';
-import { createPlan, deletePlan, getPlan, updatePlan } from './routes/admin/Plan.js';
+import { createCustomPlan, createPlan, deleteCustomPlan, deletePlan, getCustomPlan, getPlan, updateCustomPlan, updatePlan } from './routes/admin/Plan.js';
 import { createStaff, deleteStaff, getStaff, getStaffById, updateStaff } from './routes/admin/Staff.js';
 import { applicationFunnel, systemHealth, userInsight } from './routes/admin/dashboardOverview.js';
 import { grantPro, userAction, userDetail, userList } from './routes/admin/userManagement.js';
 import { perUserActivity, systemWiseLog } from './routes/admin/userActivityLogs.js';
 import { appToast, deleteToast, editToast, getToast, planExpiry, usesReminder, weeklyDigest } from './routes/admin/notificationsManager.js';
 import { createPromo, deletePromo, editPromo, getPromo } from './routes/admin/promoTrials.js';
+import { grantCustomPlan, manualUpDown } from './routes/admin/SubscriptionAndBilling.js';
 
 const app=express()
 dotenv.config();
@@ -35,6 +36,7 @@ app.use(express.json())
 //      employeer login and signup
 app.use('/',login)
 app.use('/',signup)
+app.use('/',profileVeirfy)
 app.use('/',resetPass)
 app.use('/',forgotPass)
 
@@ -72,6 +74,10 @@ app.use('/',createPlan)
 app.use('/',getPlan)
 app.use('/',updatePlan)
 app.use('/',deletePlan)
+app.use('/',createCustomPlan)
+app.use('/',getCustomPlan)
+app.use('/',updateCustomPlan)
+app.use('/',deleteCustomPlan)
 
 //      Staff
 app.use('/',createStaff)
@@ -96,6 +102,10 @@ app.use('/',grantPro)
 //      🕵️‍♀️ 3. User Activity Logs
 app.use('/',perUserActivity)
 app.use('/',systemWiseLog)
+
+//      💳 5. Subscription & Billing Control
+app.use('/',manualUpDown)
+app.use('/',grantCustomPlan)
 
 //       🎟 6. Promotional Offers & Trials
 app.use('/',createPromo)
