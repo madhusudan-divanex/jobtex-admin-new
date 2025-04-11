@@ -29,10 +29,10 @@ applyJobSchema.pre('deleteOne', { document: true, query: false }, async function
     next();
 });
 applyJobSchema.pre('deleteOne', { document: true, query: false }, async function(next) {
-    const user_id = this.user_id;  
+    const job_id = this.job_id;  
 
 
-    await mongoose.model('apply job').deleteMany({ user_id: user_id });
+    await mongoose.model('apply job').deleteMany({ job_id: job_id });
 
     next();
 });

@@ -58,6 +58,30 @@ async function getEmployeedataController(req, res) {
         return res.status(500).json({ message: error.message, success: false });
     }
 }
+async function favouriteJobController(req, res) {
+   
+    const { job_title,location, user_id } = req.body;
+    console.log(req.body)
+    try {
+        const findUser = await User.find({_id:user_id})
+        if (findUser.length > 0) {
+            const updateFavourite=await Inofrmation.findOneAndUpdate({user_id},{job_title,location},{new:true})
+
+           
+
+            if (!updateFavourite) {
+                return res.status(500).json({ message: "job and location added failed", success: false })
+            }
+            return res.status(200).json({  message: "job and location added", success: true })
+        }
+        return res.status(500).json({ message: "please do signup first", success: false })
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ message: error, success: false })
+    }
+
+}
+
 async function createDetailController(req, res) {
     console.log(req.body);
     
@@ -220,17 +244,30 @@ async function updateDetailController(req, res) {
 async function buyPlanController(req, res) {
     console.log("called")
     const { subscription_id,start_date,end_date,status,user_id } = req.body;
+    console.log(req.body)
     try {
         const findUser = await Subscription.find({user_id:user_id})
+        const planData = await Subscription.find({_id:subscription_id});
+
+        const planName=planData.name
         if (findUser.length > 0) {
-            await Subscription.deleteONe({user_id:user_id})
+            await Subscription.deleteOne({user_id:user_id})
         }
         const newSubscription = await Subscription.create({
-            subscription_id,start_date,end_date,status,user_id
+            plan_id:subscription_id,start_date,end_date,status,user_id
         })
 
         if (!newSubscription) {
             return res.status(500).json({ message: "subscription creation failed", success: false })
+        }
+        if(planData.price_of_month !==0){
+            const updateUserPlan=await User.findByIdAndUpdate({_id:user_id},{plan:planName,isPro:true},{new:true})
+            console.log("called",updateUserPlan)
+        }
+        else{
+
+            const updateUserPlan=await User.findByIdAndUpdate({_id:user_id},{plan:planName},{new:true})
+            console.log("bottom called",updateUserPlan)
         }
         return res.status(200).json({ subscription: newSubscription, message: "subscription creation success", success: true })
         //return res.status(500).json({ message: "please do signup first", success: false })
@@ -333,4 +370,4 @@ async function deleteCvController(req, res) {
     }
 }
 
-export { createProfileController,getEmployeedataController,createDetailController,buyPlanController,uploadCvController,updateCvController,deleteCvController }
+export { createProfileController,getEmployeedataController,favouriteJobController,createDetailController,buyPlanController,uploadCvController,updateCvController,deleteCvController }

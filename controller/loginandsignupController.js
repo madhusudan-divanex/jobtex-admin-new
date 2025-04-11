@@ -16,9 +16,9 @@ async function loginController(req,res) {
                         if(err){
                             return res.status(200).json({message:'error in token genertaion',success:false})
                         }
-                        const findLogin=await LoginUser.find({_id:existUser._id})
+                        const findLogin=await LoginUser.find({user_id:existUser._id})
                         if(findLogin){
-                            await LoginUser.deleteOne(existUser._id)
+                            await LoginUser.deleteMany({user_id:existUser._id})
                         }
                         const addLogin=await LoginUser.create({
                             user_id:existUser._id

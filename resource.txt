@@ -80,10 +80,10 @@ Backend->CRUD on Promo code and Notification and Modify api
 Frontend
     TailoredJob Admin->issue fix 
     TailoredJob User 
-        login
+        login (manual)
         forget password
         reset password
-        create account
+        create account (manual)
         verification link sent 
         personal Detail page 
         manual cv input data

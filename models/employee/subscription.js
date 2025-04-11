@@ -11,7 +11,7 @@ const subscriptionSchema = new Schema({
     customPlan_id:{
         type: mongoose.Schema.Types.ObjectId,  
         ref: 'custom_plan',
-        required: true
+        // required: true
     },
     user_id: {
         type: mongoose.Schema.Types.ObjectId,  
