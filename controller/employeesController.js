@@ -14,7 +14,7 @@ async function createProfileController(req, res) {
     // console.log("called",req.body)
     const { first_name, last_name, current_salary,cs_currency, expected_salary,es_currency, email, phone, marital_status, gender, dob, user_id } = req.body;
     try {
-        const findProfile = await User.find({email:email})
+        const findProfile = await User.find({_id:user_id})
         if (findProfile.length > 0) {
             const verifyProfile=await User.findByIdAndUpdate({_id:user_id},{isVerify:true},{new:true})
             const newProfile = await Inofrmation.create({

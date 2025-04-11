@@ -6,7 +6,7 @@ const createPlan=express.Router();
 createPlan.post('/create-plan',verify,createPlanController)
 
 const getPlan=express.Router();
-getPlan.get('/get-plan',verify,getPlanController)
+getPlan.get('/get-plan',getPlanController)
 
 const updatePlan=express.Router();
 updatePlan.put('/update-plan',verify,updatePlanController)
