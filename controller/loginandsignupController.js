@@ -29,7 +29,7 @@ async function loginController(req, res) {
                         })
                         const isManual = await Education.exists({ user_id: existUser._id }) ? true : false;
                         const isJob = await Information.exists({
-                            user_id: user_id,
+                            user_id: existUser._id,
                             job_title: { $ne: [] } ,
                             location: { $ne: [] }
                         }) ? true : false;
