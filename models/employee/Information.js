@@ -33,6 +33,6 @@ informationSchema.pre('deleteOne', { document: true, query: false }, async funct
 
     next();
 });
- const Inofrmation = mongoose.model('information', informationSchema);
+ const Information = mongoose.model('information', informationSchema);
 
-export default Inofrmation;
+export default Information;

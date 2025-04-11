@@ -5,7 +5,7 @@ import { verificationMail } from "../mail/Verification.js";
 import { forgotMail } from "../mail/Forgot.js";
 import LoginUser from "../models/employee/ActiveUser.js";
 import Education from "../models/employee/Education.js";
-import Inofrmation from "../models/employee/Information.js";
+import Information from "../models/employee/Information.js";
 async function loginController(req, res) {
     const { email, password } = req.body;
     try {

@@ -2,7 +2,7 @@ import Certification from "../models/employee/Certification.js";
 import Cv from "../models/employee/Cv.js";
 import Education from "../models/employee/Education.js";
 import Experience from "../models/employee/Experience.js";
-import Inofrmation from "../models/employee/Information.js";
+import Information from "../models/employee/Information.js";
 import Language from "../models/employee/Language.js";
 import User from "../models/employee/User.js";
 import fs from 'fs';
@@ -17,7 +17,7 @@ async function createProfileController(req, res) {
         const findProfile = await User.find({_id:user_id})
         if (findProfile.length > 0) {
             const verifyProfile=await User.findByIdAndUpdate({_id:user_id},{isVerify:true},{new:true})
-            const newProfile = await Inofrmation.create({
+            const newProfile = await Information.create({
                 first_name, last_name, current_salary,cs_currency, expected_salary,es_currency,email, phone, marital_status, gender, dob, user_id
             })
 
@@ -44,7 +44,7 @@ async function getEmployeedataController(req, res) {
            
            
         } else {
-            const personal=await Inofrmation.findOne({user_id})
+            const personal=await Information.findOne({user_id})
             const education=await Education.find({user_id})
             const experience=await Experience.find({user_id})
             const certification=await Certification.find({user_id})
@@ -65,7 +65,7 @@ async function favouriteJobController(req, res) {
     try {
         const findUser = await User.find({_id:user_id})
         if (findUser.length > 0) {
-            const updateFavourite=await Inofrmation.findOneAndUpdate({user_id},{job_title,location},{new:true})
+            const updateFavourite=await Information.findOneAndUpdate({user_id},{job_title,location},{new:true})
 
            
 

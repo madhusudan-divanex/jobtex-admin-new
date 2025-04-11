@@ -3,7 +3,7 @@ import Cv from "../models/employee/Cv.js"
 import Job from "../models/Job.js"
 import SavedJob from "../models/employee/SaveJob.js"
 import ApplyJob from "../models/employee/ApplyJob.js"
-import Inofrmation from "../models/employee/Information.js"
+import Information from "../models/employee/Information.js"
 import LoginUser from "../models/employee/ActiveUser.js"
 import Subscription from "../models/employee/subscription.js"
 import moment from "moment"
@@ -70,12 +70,12 @@ async function userInsightController(req, res) {
         const expiredProUser = await Subscription.countDocuments({ status: 'expired' });
         const allUser = await User.find();
         const totalUser = allUser.length;
-        const maleUser = await Inofrmation.countDocuments({ gender: 'male' });
-        const femaleUser = await Inofrmation.countDocuments({ gender: 'female' });
+        const maleUser = await Information.countDocuments({ gender: 'male' });
+        const femaleUser = await Information.countDocuments({ gender: 'female' });
         const malePercentage = totalUser > 0 ? (maleUser / totalUser) * 100 : 0;
         const femalePercentage = totalUser > 0 ? (femaleUser / totalUser) * 100 : 0;
 
-        const profileData = await Inofrmation.countDocuments()
+        const profileData = await Information.countDocuments()
         const profileComplete = totalUser > 0 ? parseFloat(((profileData / totalUser) * 100).toFixed(2)) : 0;
 
         const lastSixMonths = [];
@@ -207,7 +207,7 @@ async function userInsightController(req, res) {
             const totalUsers = userIds.length;
           
             // Step 2: Count profile info matching those users
-            const completedProfiles = await Inofrmation.countDocuments({ user_id: { $in: userIds } });
+            const completedProfiles = await Information.countDocuments({ user_id: { $in: userIds } });
           
             // Step 3: Calculate percentage
             const percentage = totalUsers > 0 ? parseFloat(((completedProfiles / totalUsers) * 100).toFixed(2)) : 0;

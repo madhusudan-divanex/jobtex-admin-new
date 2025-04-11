@@ -1,14 +1,14 @@
 import LoginUser from "../models/employee/ActiveUser.js"
 import ApplyJob from "../models/employee/ApplyJob.js"
 import Generated from "../models/employee/GeneratedCv.js"
-import Inofrmation from "../models/employee/Information.js"
+import Information from "../models/employee/Information.js"
 import SavedJob from "../models/employee/SaveJob.js"
 import User from "../models/employee/User.js"
 
 async function userListController(req, res) {
     try {
         // const generalDetail=await User.find()
-        // const informationDetail=await Inofrmation.find()
+        // const informationDetail=await Information.find()
         const mergeData = await User.aggregate([
             {
                 $lookup: {
@@ -57,7 +57,7 @@ async function userDetailController(req,res) {
     const id=req.params.id
     try {
         const generalDetail=await User.findOne(id)
-        const informationDetail=await Inofrmation.findOne(id)
+        const informationDetail=await Information.findOne(id)
         const lastActive=await LoginUser.findOne({_id:id}).select('createdAt')
         const appliedJob=await ApplyJob.find(id)
         const savedJob=await SavedJob.find(id)
