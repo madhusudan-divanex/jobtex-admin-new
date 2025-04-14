@@ -24,6 +24,9 @@ const jobSchema = new Schema({
         required: [true, 'Job Category is required'],  
        
     },
+    company_photo:{
+        type:String
+    },
     skills: {
         type: [String],
         required: [true, 'Job Skill is required'],  

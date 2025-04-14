@@ -11,40 +11,71 @@ async function userListController(req, res) {
         // const informationDetail=await Information.find()
         const mergeData = await User.aggregate([
             {
-                $lookup: {
-                    from: "login_users", 
-                    let: { userId: "$_id" }, 
-                    pipeline: [
-                        {
-                            $match: {
-                                $expr: { $eq: ["$user_id", "$$userId"] } 
-                            }
-                        }
-                    ],
-                    as: "lastActive"  // This will contain the matched data
-                }
+              $lookup: {
+                from: "login_users",
+                let: { userId: "$_id" },
+                pipeline: [
+                  {
+                    $match: {
+                      $expr: { $eq: ["$user_id", "$$userId"] }
+                    }
+                  }
+                ],
+                as: "lastActive"
+              }
             },
             {
-                $lookup: {
-                    from: "information",  // The name of the information collection
-                    localField: "_id",    // The field to join from the User collection (ObjectId)
-                    foreignField: "user_id",  // The field in the information collection to join (ObjectId)
-                    as: "userInformation"  // Alias for the user information
-                }
+              $lookup: {
+                from: "information",
+                localField: "_id",
+                foreignField: "user_id",
+                as: "informationData"
+              }
             },
             {
-                $unwind: {
-                    path: "$userInformation",  // Unwind the userInformation array
-                    preserveNullAndEmptyArrays: true  // Keep the array even if there are no matches
-                }
+              $lookup: {
+                from: "educations",
+                localField: "_id",
+                foreignField: "user_id",
+                as: "educationData"
+              }
             },
             {
-                $unwind: {
-                    path: "$lastActive",  // Unwind the lastActive array
-                    preserveNullAndEmptyArrays: true  // Keep the array even if there are no matches
+              $addFields: {
+                profileCompletion: {
+                  $add: [
+                    {
+                      $cond: [
+                        { $gt: [{ $size: "$informationData" }, 0] },
+                        50,
+                        0
+                      ]
+                    },
+                    {
+                      $cond: [
+                        { $gt: [{ $size: "$educationData" }, 0] },
+                        50,
+                        0
+                      ]
+                    }
+                  ]
                 }
+              }
+            },
+            {
+              $unwind: {
+                path: "$informationData",
+                preserveNullAndEmptyArrays: true
+              }
+            },
+            {
+              $unwind: {
+                path: "$lastActive",
+                preserveNullAndEmptyArrays: true
+              }
             }
-        ]);
+          ]);
+          
      
         return res.status(200).json({ message: 'data fetched',data:mergeData, success: true })
     } catch (error) {

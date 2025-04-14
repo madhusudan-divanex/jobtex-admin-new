@@ -7,6 +7,7 @@ import Information from "../models/employee/Information.js"
 import LoginUser from "../models/employee/ActiveUser.js"
 import Subscription from "../models/employee/subscription.js"
 import moment from "moment"
+import Education from "../models/employee/Education.js"
 
 async function systemHealthController(req, res) {
 
@@ -72,11 +73,15 @@ async function userInsightController(req, res) {
         const totalUser = allUser.length;
         const maleUser = await Information.countDocuments({ gender: 'male' });
         const femaleUser = await Information.countDocuments({ gender: 'female' });
-        const malePercentage = totalUser > 0 ? (maleUser / totalUser) * 100 : 0;
-        const femalePercentage = totalUser > 0 ? (femaleUser / totalUser) * 100 : 0;
 
-        const profileData = await Information.countDocuments()
-        const profileComplete = totalUser > 0 ? parseFloat(((profileData / totalUser) * 100).toFixed(2)) : 0;
+        const totalWithGender = maleUser + femaleUser;
+
+        const malePercentage = totalWithGender > 0 ? (maleUser / totalWithGender) * 100 : 0;
+        const femalePercentage = totalWithGender > 0 ? (femaleUser / totalWithGender) * 100 : 0;
+
+        // const profileData = await Information.countDocuments()
+        // const profileComplete = totalUser > 0 ? parseFloat(((profileData / totalUser) * 100).toFixed(2)) : 0;
+        const profileComplete = await profileData()
 
         const lastSixMonths = [];
         for (let i = 0; i < 6; i++) {
@@ -94,7 +99,7 @@ async function userInsightController(req, res) {
             lastSixMonthsExpire.push({
                 year: month.getFullYear(),
                 month: month.getMonth() + 1, // month is 0-indexed, so we add 1 to it
-              });
+            });
         }
 
 
@@ -156,14 +161,14 @@ async function userInsightController(req, res) {
             }
         ]);
         const monthNames = [
-            "January", "February", "March", "April", "May", "June", 
+            "January", "February", "March", "April", "May", "June",
             "July", "August", "September", "October", "November", "December"
-          ];
+        ];
         const expiredProUserByMonth = await Subscription.aggregate([
             {
                 $match: {
                     status: 'expired',
-                    end_date: { $gte: lastSixMonths[5] } 
+                    end_date: { $gte: lastSixMonths[5] }
                 }
             },
             {
@@ -189,39 +194,61 @@ async function userInsightController(req, res) {
         ]);
         const expireResult = lastSixMonthsExpire.map((month) => {
             const found = expiredProUserByMonth.find(
-              (data) => data.year === month.year && data.month === month.month
+                (data) => data.year === month.year && data.month === month.month
             );
             return found ? { ...found, month: monthNames[found.month - 1] } : { year: month.year, month: monthNames[month.month - 1], count: 0 };
-          });
-         
-          let profileCompleteData = [];
+        });
 
-          for (let i = 5; i >= 0; i--) {
+        let profileCompleteData = [];
+
+        for (let i = 5; i >= 0; i--) {
             const start = moment().subtract(i, 'months').startOf('month').toDate();
             const end = moment().subtract(i, 'months').endOf('month').toDate();
-          
-            // Step 1: Get all users created this month
+
+            // Step 1: Get all users created in this month
             const users = await User.find({ createdAt: { $gte: start, $lte: end } }).select('_id');
-          
             const userIds = users.map(user => user._id);
             const totalUsers = userIds.length;
-          
-            // Step 2: Count profile info matching those users
-            const completedProfiles = await Information.countDocuments({ user_id: { $in: userIds } });
-          
-            // Step 3: Calculate percentage
-            const percentage = totalUsers > 0 ? parseFloat(((completedProfiles / totalUsers) * 100).toFixed(2)) : 0;
-          
-            profileCompleteData.push({
-              month: moment(start).format('MMM YYYY'),
-              totalUsers,
-              completedProfiles,
-              percentage
+
+            // Step 2: Get which users have Information and Education
+            const infoUsers = await Information.find({ user_id: { $in: userIds } }, 'user_id');
+            const eduUsers = await Education.find({ user_id: { $in: userIds } }, 'user_id');
+
+            const infoUserIds = new Set(infoUsers.map(u => u.user_id.toString()));
+            const eduUserIds = new Set(eduUsers.map(u => u.user_id.toString()));
+
+            // Step 3: Score each user and calculate completion
+            let completedUsers = 0;
+            let totalScore = 0;
+
+            userIds.forEach(id => {
+                const idStr = id.toString();
+                const hasInfo = infoUserIds.has(idStr);
+                const hasEdu = eduUserIds.has(idStr);
+
+                if (hasInfo && hasEdu) {
+                    totalScore += 100;
+                    completedUsers++;
+                } else if (hasInfo || hasEdu) {
+                    totalScore += 50;
+                    completedUsers++;
+                }
             });
-          }
-          
-          
-          
+
+            const percentage = totalUsers > 0 ? parseFloat((totalScore / totalUsers).toFixed(2)) : 0;
+
+            // Step 4: Push into result array
+            profileCompleteData.push({
+                month: moment(start).format('MMM YYYY'),
+                totalUsers,
+                completedProfiles: completedUsers, // users with at least partial profile
+                percentage
+            });
+        }
+
+
+
+
         // daily weekly signup
         const today = new Date();
         const oneWeekAgo = new Date(today);
@@ -232,32 +259,32 @@ async function userInsightController(req, res) {
         const yesterdayEnd = new Date(today);
         yesterdayEnd.setDate(today.getDate() - 1);
         yesterdayEnd.setHours(23, 59, 59, 999);
-       
+
         // daily active user
         const result = [];
 
-     
+
         for (let i = 0; i < 7; i++) {
             const startOfDay = new Date(today);
             startOfDay.setDate(today.getDate() - i);
-            startOfDay.setHours(0, 0, 0, 0);  
+            startOfDay.setHours(0, 0, 0, 0);
 
             const endOfDay = new Date(today);
             endOfDay.setDate(today.getDate() - i);
-            endOfDay.setHours(23, 59, 59, 999);  
+            endOfDay.setHours(23, 59, 59, 999);
 
-            
+
             const activeUserCount = await LoginUser.countDocuments({
                 createdAt: { $gte: startOfDay, $lte: endOfDay }
             });
 
-            
+
             const dayLabel = i === 0 ? "Today" : (i === 1 ? "Yesterday" : `Day ${i} ago`);
             result.push({ day: dayLabel, activeUsers: activeUserCount });
         }
 
-      
-        
+
+
 
         // Get day-wise signup counts for the last 6 days
         const daywiseSignup = [];
@@ -288,9 +315,9 @@ async function userInsightController(req, res) {
             weekwiseSignup.push(weekSignups);
         }
         // profile completion rate
-        const dailyActiveUser=result
+        const dailyActiveUser = result
 
-        const data = { freeUser, proUser, dailyActiveUser, daywiseSignup, weekwiseSignup,profileCompleteData, freeUsersByMonth, proUsersByMonth, profileComplete, expireResult,  malePercentage, femalePercentage, expiredProUser }
+        const data = { freeUser, proUser, dailyActiveUser, daywiseSignup, weekwiseSignup, profileCompleteData, freeUsersByMonth, proUsersByMonth, profileComplete, expireResult, malePercentage, femalePercentage, expiredProUser }
         return res.status(200).json({ message: 'user insight fetch', data, success: true })
     } catch (error) {
         return res.status(500).json({ message: error.message, success: false })
@@ -313,9 +340,9 @@ async function applicationFunnelController(req, res) {
             {
                 $sort: { userCount: -1 }  // Sort by userCount in descending order
             },
-            {
-                $limit: 10  // Get the top 10 combinations
-            },
+            // {
+            //     $limit: 10  // Get the top 10 combinations
+            // },
             {
                 $project: {
                     category: "$_id.category",  // Extract category from _id
@@ -333,7 +360,69 @@ async function applicationFunnelController(req, res) {
     }
 }
 
+async function expireProController(req, res) {
+    try {
+      const getAllExpiredUser = await Subscription.find({
+       
+        status: 'expired'
+      })
+        .populate('user_id', 'first_name email')  // Populate user fields
+         //.populate('plan_id', 'name');  // Populate the plan name based on plan_id
+  
+      return res.status(200).json({
+        message: "Users fetched",
+        success: true,
+        data: getAllExpiredUser
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        message: error.message,
+        success: false
+      });
+    }
+  }
+  
+async function getActiveUserController(req,res) {
+    try {
+        const getActiveUser=await LoginUser.find().populate('user_id','first_name email')
+        return res.status(200).json({ message:"active user fetched", success: true,data:getActiveUser });
+    } catch (error) {
+        return res.status(500).json({ message: error.message, success: false });
+    }
+}
 
+async function profileData() {
+    // Step 1: Get all user IDs
+    const allUser = await User.find({}, '_id');
+    const userIds = allUser.map(user => user._id);
 
+    // Step 2: Get users with Information
+    const infoUsers = await Information.find({ user_id: { $in: userIds } }, 'user_id');
+    const infoUserIds = new Set(infoUsers.map(i => i.user_id.toString()));
 
-export { systemHealthController, userInsightController, applicationFunnelController };
+    // Step 3: Get users with Education
+    const eduUsers = await Education.find({ user_id: { $in: userIds } }, 'user_id');
+    const eduUserIds = new Set(eduUsers.map(e => e.user_id.toString()));
+
+    // Step 4: Calculate average profile completion
+    let totalCompletionScore = 0;
+
+    userIds.forEach(id => {
+        const idStr = id.toString();
+        const hasInfo = infoUserIds.has(idStr);
+        const hasEdu = eduUserIds.has(idStr);
+
+        if (hasInfo && hasEdu) {
+            totalCompletionScore += 100;
+        } else if (hasInfo || hasEdu) {
+            totalCompletionScore += 50;
+        }
+    });
+    const totalUser = userIds.length;
+
+    const result = totalUser > 0 ? parseFloat((totalCompletionScore / totalUser).toFixed(2)) : 0;
+    return result
+}
+
+export { systemHealthController, userInsightController, applicationFunnelController ,getActiveUserController,expireProController};
