@@ -334,7 +334,7 @@ async function applicationFunnelController(req, res) {
                         role: "$role",          // Group by role
                         location: "$location"   // Group by location
                     },
-                    userCount: { $sum: 1 }  // Count the number of jobs for each category-role-location combination
+                    totalCount: { $sum: 1 }  // Count the number of jobs for each category-role-location combination
                 }
             },
             {
@@ -348,7 +348,7 @@ async function applicationFunnelController(req, res) {
                     category: "$_id.category",  // Extract category from _id
                     role: "$_id.role",          // Extract role from _id
                     location: "$_id.location",  // Extract location from _id
-                    userCount: 1,
+                    totalCount: 1,
                     _id: 0  // Exclude the _id field from the result
                 }
             }

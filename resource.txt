@@ -78,15 +78,23 @@ Frontend->dynamic Graph,CRUD on Notification and promocode
 Backend->CRUD on Promo code and Notification and Modify api
 
 Frontend
-    TailoredJob Admin->issue fix 
-    TailoredJob User 
-        login (manual)
-        forget password
-        reset password
-        create account (manual)
-        verification link sent 
-        personal Detail page 
-        manual cv input data
+TailoredJob Admin->
+    clickable card
+    applied job page
+    saved job page 
+    active user page 
+    cv and cover page
+    expire pro user page 
+    role and location page 
+    new signup page
+
+Backend
+    applied job api
+    saved job api 
+    active user api 
+    cv and cover api
+    expire pro user api 
+    new signup api
 
 Backend
 🛠 4. API Performance Monitoring

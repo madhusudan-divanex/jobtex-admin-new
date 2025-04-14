@@ -9,6 +9,7 @@ import fs from 'fs';
 import Role from "../models/Role.js";
 import path from 'path';
 import Subscription from "../models/employee/subscription.js";
+import Plan from "../models/Plan.js";
 
 async function createProfileController(req, res) {
     // console.log("called",req.body)
@@ -37,20 +38,29 @@ async function createProfileController(req, res) {
 async function getEmployeedataController(req, res) {
   const id=req.params.id
     try {
-        const employee=await User.findById(id);
-        const user_id=employee._id
-        if (!employee) {
-            return res.status(404).json({ message: "no Employee found", success: false });
+        const user=await User.findById(id);
+        const user_id=user._id
+        if (!user) {
+            return res.status(404).json({ message: "no user found", success: false });
            
            
         } else {
+            const subscription = await Subscription.findOne({ user_id });
+            if (subscription) {
+              const currentDate = new Date();
+              if (subscription.end_date < currentDate && subscription.status !== 'expired') {
+                // Update status to 'expired' if expired
+                subscription.status = 'expired';
+                await subscription.save();
+              }
+            }
             const personal=await Information.findOne({user_id})
             const education=await Education.find({user_id})
             const experience=await Experience.find({user_id})
             const certification=await Certification.find({user_id})
             const language=await Language.find({user_id})
             const cv=await Cv.find({user_id})
-            return res.status(200).json({ personal,education,experience,certification,language,cv, message: "Employee Fetched", success: true });
+            return res.status(200).json({user, personal,education,experience,certification,language,cv, message: "user Fetched", success: true });
             
         }
     } catch (error) {
@@ -242,14 +252,15 @@ async function updateDetailController(req, res) {
 }
 
 async function buyPlanController(req, res) {
-    console.log("called")
+   
     const { subscription_id,start_date,end_date,status,user_id } = req.body;
-    console.log(req.body)
+   
     try {
         const findUser = await Subscription.find({user_id:user_id})
-        const planData = await Subscription.find({_id:subscription_id});
+        const planData = await Plan.find({_id:subscription_id});
 
-        const planName=planData.name
+        const planName=planData[0].name
+       
         if (findUser.length > 0) {
             await Subscription.deleteOne({user_id:user_id})
         }
@@ -262,12 +273,12 @@ async function buyPlanController(req, res) {
         }
         if(planData.price_of_month !==0){
             const updateUserPlan=await User.findByIdAndUpdate({_id:user_id},{plan:planName,isPro:true},{new:true})
-            console.log("called",updateUserPlan)
+           
         }
         else{
 
             const updateUserPlan=await User.findByIdAndUpdate({_id:user_id},{plan:planName},{new:true})
-            console.log("bottom called",updateUserPlan)
+           
         }
         return res.status(200).json({ subscription: newSubscription, message: "subscription creation success", success: true })
         //return res.status(500).json({ message: "please do signup first", success: false })
@@ -279,6 +290,7 @@ async function buyPlanController(req, res) {
 }
 
 async function uploadCvController(req,res) {
+    console.log(req.body)
     const {user_id,cv_file,cover_file}=req.body;
     try {
         const path = req.files["cv_file"] ? req.files["cv_file"][0].path : null;

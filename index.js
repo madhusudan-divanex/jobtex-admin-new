@@ -13,7 +13,7 @@ import { buyPlan, createDetail, createProfile, deleteCv, favouriteJob, getEmploy
 import { verifyToken } from './routes/verify-route.js';
 import { createCustomPlan, createPlan, deleteCustomPlan, deletePlan, getCustomPlan, getPlan, updateCustomPlan, updatePlan } from './routes/admin/Plan.js';
 import { createStaff, deleteStaff, getStaff, getStaffById, updateStaff } from './routes/admin/Staff.js';
-import { allExpirePro, applicationFunnel, getActiveUser, systemHealth, userInsight } from './routes/admin/dashboardOverview.js';
+import { allExpirePro, applicationFunnel, getActiveUser, getAllCoverAndCv, getNewSignUp, systemHealth, userInsight } from './routes/admin/dashboardOverview.js';
 import { grantPro, userAction, userDetail, userList } from './routes/admin/userManagement.js';
 import { perUserActivity, systemWiseLog } from './routes/admin/userActivityLogs.js';
 import { appToast, deleteToast, editToast, getToast, planExpiry, usesReminder, weeklyDigest } from './routes/admin/notificationsManager.js';
@@ -93,6 +93,8 @@ app.use('/',deleteStaff)
 app.use('/',systemHealth)
 app.use('/',getAllAppliedJob)
 app.use('/',allExpirePro)
+app.use('/',getNewSignUp)
+app.use('/',getAllCoverAndCv)
 app.use('/',getActiveUser)
 app.use('/',getAllSavedJob)
 app.use('/',userInsight)

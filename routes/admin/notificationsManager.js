@@ -6,7 +6,7 @@ const appToast=express.Router();
 appToast.post('/create-toast',verify,appToastController)
 
 const getToast=express.Router();
-getToast.get('/get-toast',verify,getToastController)
+getToast.get('/get-toast',getToastController)
 
 const editToast=express.Router();
 editToast.post('/update-toast',verify,editToastController)

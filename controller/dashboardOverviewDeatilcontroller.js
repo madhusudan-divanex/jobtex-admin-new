@@ -1,5 +1,6 @@
 import ApplyJob from "../models/employee/ApplyJob.js";
 import SavedJob from "../models/employee/SaveJob.js";
+import User from "../models/employee/User.js";
 
 async function getAllAppliedJobController(req,res) {
     try {
@@ -70,7 +71,7 @@ async function getCvStatsController(req, res) {
         }
       ]);
   
-      res.status(200).json({
+      return res.status(200).json({
         message: 'CV stats fetched successfully',
         success: true,
         data
@@ -79,6 +80,22 @@ async function getCvStatsController(req, res) {
       res.status(500).json({ message: error.message, success: false });
     }
   }
+
+  async function getNewSignUpController(req, res) {
+    try {
+      const today = new Date();
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(today.getDate() - 30); // subtract 30 days
+  
+      const newSignUps = await User.find({
+        createdAt: { $gte: thirtyDaysAgo }
+      });
+  
+      res.status(200).json({ message: "New signups in the last 30 days", data: newSignUps, success: true });
+    } catch (error) {
+      res.status(500).json({ message: error.message, success: false });
+    }
+  }
   
 
-export {getAllAppliedJobController,getAllSavedJobController,getCvStatsController}
+export {getAllAppliedJobController,getAllSavedJobController,getCvStatsController,getNewSignUpController}
