@@ -77,7 +77,7 @@ async function getCvStatsController(req, res) {
         data
       });
     } catch (error) {
-      res.status(500).json({ message: error.message, success: false });
+      return res.status(500).json({ message: error.message, success: false });
     }
   }
 

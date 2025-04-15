@@ -1,5 +1,5 @@
 import express from 'express'
-import { buyPlanController, createDetailController, createProfileController, deleteCvController, favouriteJobController, getEmployeedataController, updateCvController, uploadCvController } from '../controller/employeesController.js'
+import { buyPlanController, createDetailController, createProfileController, deleteCvController, favouriteJobController, getEmployeedataController, updateCvController, updateDetailController, uploadCvController } from '../controller/employeesController.js'
 import { CV } from '../middleware/cv.js'
 
 const createProfile=express.Router()
@@ -14,6 +14,9 @@ favouriteJob.post('/favourite-job-location',favouriteJobController)
 const createDetail=express.Router() // store education , experince , skill ,language ,certification
 createDetail.post('/create-detail',createDetailController)
 
+const editDetail=express.Router()
+editDetail.put('/edit-detail',updateDetailController)
+
 const buyPlan=express.Router()
 buyPlan.post('/buy-plan',buyPlanController)
 
@@ -26,4 +29,4 @@ updateCv.put('/update-cv',CV,updateCvController)
 const deleteCv=express.Router()
 deleteCv.delete('/delete-cv',CV,deleteCvController)
 
-export {createProfile,getEmployeeData,favouriteJob,createDetail,buyPlan,uploadCv,updateCv,deleteCv}
+export {createProfile,getEmployeeData,favouriteJob,createDetail,editDetail,buyPlan,uploadCv,updateCv,deleteCv}

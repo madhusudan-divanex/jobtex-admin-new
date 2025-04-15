@@ -87,6 +87,9 @@ TailoredJob Admin->
     expire pro user page 
     role and location page 
     new signup page
+    Notification
+    Job Category
+    Total Job in Location
 
 Backend
     applied job api

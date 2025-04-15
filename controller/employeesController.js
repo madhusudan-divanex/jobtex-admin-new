@@ -173,8 +173,8 @@ async function createDetailController(req, res) {
 
 async function updateDetailController(req, res) {
     const { user_id } = req.body;
-    const { educationForm, experienceForm, certificationForm, languageForm, skillForm } = req.body;
-
+    const { educationForm, detailForm,experienceForm, certificationForm, languageForm, skillForm ,userForm} = req.body;
+    // console.log(req.body)
     try {
       
         const findUser = await User.findOne({ _id: user_id });
@@ -188,9 +188,10 @@ async function updateDetailController(req, res) {
         let isCertificationUpdated = false;
         let isLanguageUpdated = false;
         let isSkillUpdated = false;
+        let isDetailUpdated=false
 
       
-        if (educationForm && educationForm.length > 0) {
+        if (educationForm ) {
             isEducationUpdated = true;
           
             await Education.deleteMany({ user_id });
@@ -202,9 +203,9 @@ async function updateDetailController(req, res) {
         }
 
       
-        if (experienceForm && experienceForm.length > 0) {
+        if (experienceForm ) {
             isExperienceUpdated = true;
-          
+          console.log("calling")
             await Experience.deleteMany({ user_id });
             const experienceEntries = experienceForm.map(exp => ({
                 ...exp,
@@ -214,7 +215,7 @@ async function updateDetailController(req, res) {
         }
 
       
-        if (certificationForm && certificationForm.length > 0) {
+        if (certificationForm) {
             isCertificationUpdated = true;
            
             await Certification.deleteMany({ user_id });
@@ -226,7 +227,7 @@ async function updateDetailController(req, res) {
         }
 
       
-        if (languageForm && languageForm.length > 0) {
+        if (languageForm ) {
             isLanguageUpdated = true;
            
             await Language.deleteMany({ user_id });
@@ -238,11 +239,23 @@ async function updateDetailController(req, res) {
         }
 
      
-        if (skillForm && skillForm.length > 0) {
+        if (skillForm ) {
             isSkillUpdated = true;
            
             await User.findByIdAndUpdate({ _id: user_id }, { skill: skillForm }, { new: true });
         }
+
+        if (detailForm ) {
+            isDetailUpdated = true;
+          
+            await Information.findOneAndUpdate({ user_id },
+                {first_name:detailForm.first_name,last_name:detailForm.last_name,phone:detailForm.phone,current_salary:detailForm.current_salary,cs_currency:detailForm.cs_currency, expected_salary:detailForm.expected_salary
+                    ,es_currency:detailForm.es_currency, marital_status:detailForm.marital_status, gender:detailForm.gender, dob:detailForm.dob},{new:true});
+           await User.findByIdAndUpdate({_id:user_id},{first_name:detailForm.first_name,last_name:detailForm.last_name},{new:true})         
+            
+        }
+        const checkEmail= await User.findByIdAndUpdate({_id:user_id},{email:userForm.email},{new:true})
+
 
         return res.status(200).json({ message: "Profile updated successfully", success: true });
 
@@ -382,4 +395,4 @@ async function deleteCvController(req, res) {
     }
 }
 
-export { createProfileController,getEmployeedataController,favouriteJobController,createDetailController,buyPlanController,uploadCvController,updateCvController,deleteCvController }
+export { createProfileController,getEmployeedataController,favouriteJobController,createDetailController,updateDetailController,buyPlanController,uploadCvController,updateCvController,deleteCvController }

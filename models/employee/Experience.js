@@ -6,7 +6,10 @@ const experienceSchema = new Schema({
     company_name :String,
     job_title :String,
     employment_type :String,
-    currently_working:String,
+    currently_working:{
+        type:Boolean,
+        default:false
+    },
     start_date:Date,
     end_date:Date,
     description:String,

@@ -2,7 +2,7 @@ import mongoose, { Schema } from 'mongoose';
 
 const languageSchema = new Schema({
     language_name:String,
-    language_profiency :String,
+    language_proficency :String,
     user_id: {
             type: mongoose.Schema.Types.ObjectId,  
             ref: 'user',
