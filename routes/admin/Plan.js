@@ -1,5 +1,5 @@
 import express from 'express'
-import { createCustomPlanController, createPlanController, deleteCustomPlanController, deletePlanController, getCustomPlanController, getPlanController, updateCustomPlanController, updatePlanController } from '../../controller/planController.js';
+import { createCustomPlanController, createPlanController, deleteCustomPlanController, deletePlanController, getCustomPlanController, getPlanByIdController, getPlanController, updateCustomPlanController, updatePlanController } from '../../controller/planController.js';
 import verify from '../../middleware/verify.js';
 
 const createPlan=express.Router();
@@ -7,6 +7,9 @@ createPlan.post('/create-plan',verify,createPlanController)
 
 const getPlan=express.Router();
 getPlan.get('/get-plan',getPlanController)
+
+const getPlanById=express.Router();
+getPlanById.get('/get-plan-by-id/:id',getPlanByIdController)
 
 const updatePlan=express.Router();
 updatePlan.put('/update-plan',verify,updatePlanController)
@@ -28,4 +31,4 @@ updateCustomPlan.put('/update-custom-plan',verify,updateCustomPlanController)
 const deleteCustomPlan=express.Router();
 deleteCustomPlan.delete('/delete-custom-plan/:id',verify,deleteCustomPlanController)
 
-export {createPlan,getPlan,updatePlan,deletePlan,createCustomPlan,getCustomPlan,updateCustomPlan,deleteCustomPlan}
+export {createPlan,getPlan,getPlanById,updatePlan,deletePlan,createCustomPlan,getCustomPlan,updateCustomPlan,deleteCustomPlan}

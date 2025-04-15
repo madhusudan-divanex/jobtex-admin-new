@@ -14,7 +14,7 @@ const deleteJob=express.Router();
 deleteJob.delete('/delete-job/:id',verify,deleteJobController)
 
 const getAllJob=express.Router();
-getAllJob.get('/get-all-job',verify,getAllJobController)
+getAllJob.get('/get-all-job',getAllJobController)
 
 const getAllAppliedJob=express.Router()
 getAllAppliedJob.get('/get-apply-job',getAllAppliedJobController)

@@ -11,7 +11,7 @@ import { createReport, getAllReport, getReportById } from './routes/report.js';
 import { adminLogin, getEmployeeAll, planEmployee } from './routes/admin/Login.js';
 import { buyPlan, createDetail, createProfile, deleteCv, editDetail, favouriteJob, getEmployeeData, updateCv, uploadCv } from './routes/employees.js';
 import { verifyToken } from './routes/verify-route.js';
-import { createCustomPlan, createPlan, deleteCustomPlan, deletePlan, getCustomPlan, getPlan, updateCustomPlan, updatePlan } from './routes/admin/Plan.js';
+import { createCustomPlan, createPlan, deleteCustomPlan, deletePlan, getCustomPlan, getPlan, getPlanById, updateCustomPlan, updatePlan } from './routes/admin/Plan.js';
 import { createStaff, deleteStaff, getStaff, getStaffById, updateStaff } from './routes/admin/Staff.js';
 import { allExpirePro, applicationFunnel, getActiveUser, getAllCoverAndCv, getNewSignUp, systemHealth, userInsight } from './routes/admin/dashboardOverview.js';
 import { grantPro, userAction, userDetail, userList } from './routes/admin/userManagement.js';
@@ -74,6 +74,7 @@ app.use('/',verifyToken)
 //      Plan
 app.use('/',createPlan)
 app.use('/',getPlan)
+app.use('/',getPlanById)
 app.use('/',updatePlan)
 app.use('/',deletePlan)
 app.use('/',createCustomPlan)

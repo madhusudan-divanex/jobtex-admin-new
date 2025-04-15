@@ -30,6 +30,21 @@ async function getPlanController(req,res) {
         return res.status(500).json({message:error.message,success:false})
     }
 }
+async function getPlanByIdController(req,res) {
+    const id=req.params.id
+    
+    
+    try {
+        const planDetail=await Plan.findOne({_id:id})
+        if(planDetail ){
+            return res.status(200).json({message:"Plan fetched",plans:planDetail,success:true})
+        }
+        return res.status(400).json({message:"plan not found",success:false})
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({message:error.message,success:false})
+    }
+}
 
 async function updatePlanController(req,res) {
     const {name,price_of_month,price_of_year,feature,id}=req.body;
@@ -126,4 +141,4 @@ async function deleteCustomPlanController(req,res) {
 
 
 
-export {createPlanController,getPlanController,updatePlanController,deletePlanController,createCustomPlanController,getCustomPlanController,updateCustomPlanController,deleteCustomPlanController}
+export {createPlanController,getPlanController,getPlanByIdController,updatePlanController,deletePlanController,createCustomPlanController,getCustomPlanController,updateCustomPlanController,deleteCustomPlanController}

@@ -1,6 +1,7 @@
 import express from 'express'
 import { buyPlanController, createDetailController, createProfileController, deleteCvController, favouriteJobController, getEmployeedataController, updateCvController, updateDetailController, uploadCvController } from '../controller/employeesController.js'
 import { CV } from '../middleware/cv.js'
+import { userPhoto } from '../middleware/user_photo.js'
 
 const createProfile=express.Router()
 createProfile.post('/create-profile',createProfileController)
@@ -15,7 +16,7 @@ const createDetail=express.Router() // store education , experince , skill ,lang
 createDetail.post('/create-detail',createDetailController)
 
 const editDetail=express.Router()
-editDetail.put('/edit-detail',updateDetailController)
+editDetail.put('/edit-detail',userPhoto,updateDetailController)
 
 const buyPlan=express.Router()
 buyPlan.post('/buy-plan',buyPlanController)

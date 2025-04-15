@@ -78,26 +78,25 @@ Frontend->dynamic Graph,CRUD on Notification and promocode
 Backend->CRUD on Promo code and Notification and Modify api
 
 Frontend
-TailoredJob Admin->
-    clickable card
-    applied job page
-    saved job page 
-    active user page 
-    cv and cover page
-    expire pro user page 
-    role and location page 
-    new signup page
-    Notification
-    Job Category
-    Total Job in Location
+TailoredJob website->
+    clickable navbar 
+    go to profile after login
+TailoredJob user->
+    Profile page
+        Education
+        Experience
+        language
+        Certifications
+        Personal Detail 
+    Header  ->Dynamic
+    Plan
+    Home Page->
+        List of job 
+     
 
 Backend
-    applied job api
-    saved job api 
-    active user api 
-    cv and cover api
-    expire pro user api 
-    new signup api
+    Update Api (Education,Experience,language,Certifications,Personal Detail  )
+    get plan 
 
 Backend
 🛠 4. API Performance Monitoring
