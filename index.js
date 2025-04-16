@@ -2,14 +2,14 @@ import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
 import ConnectToDb from './config/dbConfig.js';
-import { forgotPass, login, profileVeirfy, resetPass, signup } from './routes/loginandsignup.js';
+import { deleteUser, forgotPass, login, profileVeirfy, resetPass, signup } from './routes/loginandsignup.js';
 import { deleteJob, editJob, getAllAppliedJob, getAllJob, getAllSavedJob, getJobByCompany, getJobById, newJob } from './routes/jobs.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { createReport, getAllReport, getReportById } from './routes/report.js';
 import { adminLogin, getEmployeeAll, planEmployee } from './routes/admin/Login.js';
-import { buyPlan, createDetail, createProfile, deleteCv, editDetail, favouriteJob, getEmployeeData, updateCv, uploadCv } from './routes/employees.js';
+import { applyJob, buyPlan, createDetail, createProfile, deleteCv, editDetail, favouriteJob, getEmployeeData, removeSaveJob, saveJob, updateCv, uploadCv } from './routes/employees.js';
 import { verifyToken } from './routes/verify-route.js';
 import { createCustomPlan, createPlan, deleteCustomPlan, deletePlan, getCustomPlan, getPlan, getPlanById, updateCustomPlan, updatePlan } from './routes/admin/Plan.js';
 import { createStaff, deleteStaff, getStaff, getStaffById, updateStaff } from './routes/admin/Staff.js';
@@ -39,6 +39,7 @@ app.use('/',signup)
 app.use('/',profileVeirfy)
 app.use('/',resetPass)
 app.use('/',forgotPass)
+app.use('/',deleteUser)
 
 //      employeer detail
 app.use('/',createProfile)
@@ -50,6 +51,10 @@ app.use('/',buyPlan)
 app.use('/',uploadCv)
 app.use('/',updateCv)
 app.use('/',deleteCv)
+app.use('/',saveJob)
+app.use('/',removeSaveJob)
+app.use('/',applyJob)
+
 
 //     jobs api
 app.use('/',newJob)

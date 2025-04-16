@@ -1,5 +1,5 @@
 import express from 'express'
-import { forgotController, loginController, profileVerifyController, resetController, signUpController } from '../controller/loginandsignupController.js';
+import { deleteUserController, forgotController, loginController, profileVerifyController, resetController, signUpController } from '../controller/loginandsignupController.js';
 
 const signup=express.Router();
 signup.post('/create-account',signUpController)
@@ -16,4 +16,7 @@ forgotPass.post('/forgot-password',forgotController)
 const resetPass=express.Router()
 resetPass.post('/reset-password',resetController)
 
-export {signup,login,profileVeirfy,forgotPass,resetPass}
+const deleteUser=express.Router()
+deleteUser.delete('/delete-user/:id',deleteUserController)
+
+export {signup,login,profileVeirfy,forgotPass,resetPass,deleteUser}

@@ -6,6 +6,13 @@ import { forgotMail } from "../mail/Forgot.js";
 import LoginUser from "../models/employee/ActiveUser.js";
 import Education from "../models/employee/Education.js";
 import Information from "../models/employee/Information.js";
+import Experience from "../models/employee/Experience.js";
+import Certification from "../models/employee/Certification.js";
+import Language from "../models/employee/Language.js";
+import Cv from "../models/employee/Cv.js";
+import ApplyJob from "../models/employee/ApplyJob.js";
+import SavedJob from "../models/employee/SaveJob.js";
+import Subscription from "../models/employee/subscription.js";
 async function loginController(req, res) {
     const { email, password } = req.body;
     try {
@@ -134,4 +141,34 @@ async function forgotController(req, res) {
     }
 }
 
-export { loginController, signUpController, profileVerifyController, forgotController, resetController }
+async function deleteUserController(req, res) {
+    const id = req.params.id;
+    try {
+        const existUser = await User.findById(id);
+        if (!existUser) {
+            return res.status(404).json({ message: "User not found", success: false });
+        }
+
+    
+        
+        await User.deleteOne({ _id: id });
+
+        await Information.deleteOne({ user_id: id });
+        await Education.deleteMany({ user_id: id });
+        await Experience.deleteMany({ user_id: id });
+        await Certification.deleteMany({ user_id: id });
+        await Cv.deleteMany({ user_id: id });
+        await Language.deleteMany({ user_id: id });
+        await ApplyJob.deleteMany({ user_id: id });
+        await SavedJob.deleteMany({ user_id: id });
+        await Subscription.deleteMany({ user_id: id });
+
+
+        return res.status(200).json({ message: "User deleted", success: true });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Server error", success: false });
+    }
+}
+
+export { loginController, signUpController, profileVerifyController, forgotController, resetController ,deleteUserController}

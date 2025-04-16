@@ -13,13 +13,15 @@ import Plan from "../models/Plan.js";
 import SavedJob from "../models/employee/SaveJob.js";
 import ApplyJob from "../models/employee/ApplyJob.js";
 import Job from "../models/Job.js";
+import mongoose from "mongoose";
 
 async function createProfileController(req, res) {
-    // console.log("called",req.body)
+     console.log("called",req.body)
+    
     const { first_name, last_name, current_salary, cs_currency, expected_salary, es_currency, email, phone, marital_status, gender, dob, user_id } = req.body;
     try {
         const findProfile = await User.find({ _id: user_id })
-        if (findProfile.length > 0) {
+        if (findProfile) {
             const verifyProfile = await User.findByIdAndUpdate({ _id: user_id }, { isVerify: true }, { new: true })
             const newProfile = await Information.create({
                 first_name, last_name, current_salary, cs_currency, expected_salary, es_currency, email, phone, marital_status, gender, dob, user_id
@@ -64,12 +66,49 @@ async function getEmployeedataController(req, res) {
             const certification = await Certification.find({ user_id })
             const language = await Language.find({ user_id })
             const cvCount = await Cv.countDocuments({ user_id });
-            const favouriteJobCount = await SavedJob.countDocuments({ user_id });
+             const favouriteJobCount = await SavedJob.countDocuments({ user_id });
             const appliedJobCount = await ApplyJob.countDocuments({ user_id });
             const totalJobCount = await Job.countDocuments();
             const planData=await Subscription.find({user_id})
-           
-            return res.status(200).json({ user, personal, planData,education,totalJobCount, experience, certification, language, cvCount,favouriteJobCount,appliedJobCount, message: "user Fetched", success: true });
+            const favouriteJobDetails = await SavedJob.aggregate([
+                {
+                  $match: {
+                    user_id: new mongoose.Types.ObjectId(user_id)  // 👈 match specific user_id
+                  }
+                },
+                {
+                  $lookup: {
+                    from: "jobs",             // job collection
+                    localField: "job_id",     // field in SavedJob
+                    foreignField: "_id",      // matching field in Job
+                    as: "jobDetails"
+                  }
+                },
+                {
+                  $unwind: "$jobDetails"      // flatten jobDetails array
+                }
+              ]);
+              const applyJobDetails = await ApplyJob.aggregate([
+                {
+                  $match: {
+                    user_id: new mongoose.Types.ObjectId(user_id)  // 👈 match specific user_id
+                  }
+                },
+                {
+                  $lookup: {
+                    from: "jobs",             // job collection
+                    localField: "job_id",     // field in SavedJob
+                    foreignField: "_id",      // matching field in Job
+                    as: "jobDetails"
+                  }
+                },
+                {
+                  $unwind: "$jobDetails"      // flatten jobDetails array
+                }
+              ]);
+            
+              
+            return res.status(200).json({ user, personal,favouriteJobDetails,applyJobDetails, planData,education,totalJobCount, experience, certification, language, cvCount,favouriteJobCount,appliedJobCount, message: "user Fetched", success: true });
 
         }
     } catch (error) {
@@ -424,4 +463,49 @@ async function deleteCvController(req, res) {
     }
 }
 
-export { createProfileController, getEmployeedataController, favouriteJobController, createDetailController, updateDetailController, buyPlanController, uploadCvController, updateCvController, deleteCvController }
+//          Job Controller
+async function saveJobController(req,res) {
+    const {user_id,job_id}=req.body
+    try {
+        const findJob=await Job.findById(job_id)
+        if(findJob){
+            const addSaveJob=await SavedJob.create({user_id,job_id})
+            return res.status(200).json({ message: "save successfully", success: true });
+        }
+        return res.status(400).json({ message:"job not found", success: false });
+    } catch (error) {
+        return res.status(500).json({ message: error.message, success: false });
+    }
+}
+
+async function removeSaveJobController(req,res) {
+    const job_id=req.params.id
+ 
+    try {
+        const findJob=await SavedJob.findOne({job_id:job_id})
+        if(findJob){
+            const removeSaveJob=await SavedJob.findOneAndDelete({job_id})
+            return res.status(200).json({ message: "remove save successfully", success: true });
+        }
+        return res.status(400).json({ message:"job not found", success: false });
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ message: error.message, success: false });
+    }
+}
+
+async function applyJobController(req,res) {
+    const {user_id,job_id}=req.body
+    try {
+        const findJob=await Job.findById(job_id)
+        if(findJob){
+            const addSaveJob=await ApplyJob.create({user_id,job_id})
+            return res.status(200).json({ message: "applied successfully", success: true });
+        }
+        return res.status(400).json({ message:"job not found", success: false });
+    } catch (error) {
+        return res.status(500).json({ message: error.message, success: false });
+    }
+}
+
+export { createProfileController, getEmployeedataController, favouriteJobController, createDetailController, updateDetailController, buyPlanController, uploadCvController, updateCvController, deleteCvController ,saveJobController,removeSaveJobController,applyJobController}

@@ -1,5 +1,5 @@
 import express from 'express'
-import { buyPlanController, createDetailController, createProfileController, deleteCvController, favouriteJobController, getEmployeedataController, updateCvController, updateDetailController, uploadCvController } from '../controller/employeesController.js'
+import { applyJobController, buyPlanController, createDetailController, createProfileController, deleteCvController, favouriteJobController, getEmployeedataController, removeSaveJobController, saveJobController, updateCvController, updateDetailController, uploadCvController } from '../controller/employeesController.js'
 import { CV } from '../middleware/cv.js'
 import { userPhoto } from '../middleware/user_photo.js'
 
@@ -30,4 +30,14 @@ updateCv.put('/update-cv',CV,updateCvController)
 const deleteCv=express.Router()
 deleteCv.delete('/delete-cv',CV,deleteCvController)
 
-export {createProfile,getEmployeeData,favouriteJob,createDetail,editDetail,buyPlan,uploadCv,updateCv,deleteCv}
+//       Job
+const saveJob=express.Router()
+saveJob.post('/save-job',saveJobController)
+
+const removeSaveJob=express.Router()
+removeSaveJob.delete('/remove-save-job/:id',removeSaveJobController)
+
+const applyJob=express.Router()
+applyJob.post('/apply-job',applyJobController)
+
+export {createProfile,getEmployeeData,favouriteJob,createDetail,editDetail,buyPlan,uploadCv,updateCv,deleteCv,saveJob,removeSaveJob,applyJob}
