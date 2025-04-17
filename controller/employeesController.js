@@ -14,9 +14,10 @@ import SavedJob from "../models/employee/SaveJob.js";
 import ApplyJob from "../models/employee/ApplyJob.js";
 import Job from "../models/Job.js";
 import mongoose from "mongoose";
+import Report from "../models/Report.js";
 
 async function createProfileController(req, res) {
-     console.log("called",req.body)
+console.log(req.body)
     
     const { first_name, last_name, current_salary, cs_currency, expected_salary, es_currency, email, phone, marital_status, gender, dob, user_id } = req.body;
     try {
@@ -35,7 +36,7 @@ async function createProfileController(req, res) {
         return res.status(500).json({ message: "please do signup first", success: false })
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ message: error, success: false })
+        return res.status(500).json({ message: error.message, success: false })
     }
 
 }
@@ -313,10 +314,11 @@ async function updateDetailController(req, res) {
                     fs.unlinkSync(findPhoto[0].profile_url);
                 }
             }
+            
             await Information.findOneAndUpdate({ user_id },
                 {
-                    profile_url:newFilePath,first_name: detForm.first_name, last_name: detForm.last_name, phone: detForm.phone, current_salary: detForm.current_salary, cs_currency: detForm.cs_currency, expected_salary: detForm.expected_salary
-                    , es_currency: detForm.es_currency, marital_status: detForm.marital_status, gender: detForm.gender, dob: detForm.dob
+                    profile_url:newFilePath,about_me:detForm.about_me,first_name: detForm.first_name, last_name: detForm.last_name, phone: detForm.phone, current_salary: detForm.current_salary, cs_currency: detForm.cs_currency, expected_salary: detForm.expected_salary
+                    , es_currency: detForm.es_currency, marital_status: detForm.marital_status, gender: detForm.gender, dob: detForm.dob,job_title:detForm.job_title,skill:detForm.skill,employeer_skill:detForm.employeer_skill,location:detForm.location
                 }, { new: true });
             await User.findByIdAndUpdate({ _id: user_id }, { first_name: detForm.first_name, last_name: detForm.last_name }, { new: true })
 
@@ -508,4 +510,20 @@ async function applyJobController(req,res) {
     }
 }
 
-export { createProfileController, getEmployeedataController, favouriteJobController, createDetailController, updateDetailController, buyPlanController, uploadCvController, updateCvController, deleteCvController ,saveJobController,removeSaveJobController,applyJobController}
+async function createReportController(req,res) {
+    const {user_id,subject,message,attachment}=req.body
+    console.log(req.body)
+    try {
+        const findUser=await User.findOne({_id:user_id})
+        if(findUser){
+            const path = req.files["attachment"] ? req.files["attachment"][0].path : null;
+            const addReport=await Report.create({user_id,subject,message,attachment:path})
+            return res.status(200).json({ message: "contact successfully", success: true });
+        }
+        return res.status(400).json({ message:"user not found", success: false });
+    } catch (error) {
+        return res.status(500).json({ message: error.message, success: false });
+    }
+}
+
+export { createProfileController, getEmployeedataController, favouriteJobController, createDetailController, updateDetailController, buyPlanController, uploadCvController, updateCvController, deleteCvController ,saveJobController,removeSaveJobController,applyJobController,createReportController}

@@ -78,25 +78,20 @@ Frontend->dynamic Graph,CRUD on Notification and promocode
 Backend->CRUD on Promo code and Notification and Modify api
 
 Frontend
-TailoredJob website->
-    clickable navbar 
-    go to profile after login
+TailoredJob Website->
+    Dynamic Category 
+    Dynamic Employment
 TailoredJob user->
-    Profile page
-        Education
-        Experience
-        language
-        Certifications
-        Personal Detail 
-    Header  ->Dynamic
-    Plan
-    Home Page->
-        List of job 
+    Apply job 
+    Save Job 
+    Remove Save Job
+    Job Detail Page 
      
 
 Backend
-    Update Api (Education,Experience,language,Certifications,Personal Detail  )
-    get plan 
+    add save job 
+    remove save job 
+    apply job
 
 Backend
 🛠 4. API Performance Monitoring

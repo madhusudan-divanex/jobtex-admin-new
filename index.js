@@ -7,9 +7,9 @@ import { deleteJob, editJob, getAllAppliedJob, getAllJob, getAllSavedJob, getJob
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { createReport, getAllReport, getReportById } from './routes/report.js';
+import {  getAllReport, getReportById } from './routes/report.js';
 import { adminLogin, getEmployeeAll, planEmployee } from './routes/admin/Login.js';
-import { applyJob, buyPlan, createDetail, createProfile, deleteCv, editDetail, favouriteJob, getEmployeeData, removeSaveJob, saveJob, updateCv, uploadCv } from './routes/employees.js';
+import { applyJob, buyPlan, createDetail, createProfile, deleteCv, editDetail, favouriteJob, getEmployeeData, removeSaveJob, saveJob, updateCv, uploadCv,createReport } from './routes/employees.js';
 import { verifyToken } from './routes/verify-route.js';
 import { createCustomPlan, createPlan, deleteCustomPlan, deletePlan, getCustomPlan, getPlan, getPlanById, updateCustomPlan, updatePlan } from './routes/admin/Plan.js';
 import { createStaff, deleteStaff, getStaff, getStaffById, updateStaff } from './routes/admin/Staff.js';
@@ -54,6 +54,7 @@ app.use('/',deleteCv)
 app.use('/',saveJob)
 app.use('/',removeSaveJob)
 app.use('/',applyJob)
+app.use('/',createReport)
 
 
 //     jobs api
@@ -65,7 +66,7 @@ app.use('/',getJobById)
 app.use('/',getJobByCompany)
 
 //      Reports
-app.use('/',createReport)
+
 app.use('/',getAllReport)
 app.use('/',getReportById)
 

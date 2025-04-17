@@ -13,6 +13,7 @@ import Cv from "../models/employee/Cv.js";
 import ApplyJob from "../models/employee/ApplyJob.js";
 import SavedJob from "../models/employee/SaveJob.js";
 import Subscription from "../models/employee/subscription.js";
+import Report from "../models/Report.js";
 async function loginController(req, res) {
     const { email, password } = req.body;
     try {
@@ -162,6 +163,8 @@ async function deleteUserController(req, res) {
         await ApplyJob.deleteMany({ user_id: id });
         await SavedJob.deleteMany({ user_id: id });
         await Subscription.deleteMany({ user_id: id });
+        await LoginUser.deleteOne({user_id:id})
+        await Report.deleteOne({user_id:id})
 
 
         return res.status(200).json({ message: "User deleted", success: true });

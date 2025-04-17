@@ -138,7 +138,7 @@ async function getJobByCompanyJobController(req,res) {
 }
 async function getJobByIdJobController(req,res) {
     const id=req.params.id
-    console.log("called",id)
+    
     try {
         const findJob=await Job.findOne({_id:id})
         if(findJob){

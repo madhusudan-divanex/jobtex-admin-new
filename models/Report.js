@@ -4,7 +4,7 @@ const reportSchema = new Schema({
     subject:String,
     message:String,
     attachment:String,
-    userId: {
+    user_id: {
             type: mongoose.Schema.Types.ObjectId,  
             ref: 'user',
             required: true

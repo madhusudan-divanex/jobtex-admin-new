@@ -1,4 +1,4 @@
-export const base_url = 'https://jobtex.divanex.in'
+export const base_url = 'http://localhost:3000'
 
 // https://jobtex.divanex.in'
 

@@ -1,7 +1,8 @@
 import express from 'express'
-import { applyJobController, buyPlanController, createDetailController, createProfileController, deleteCvController, favouriteJobController, getEmployeedataController, removeSaveJobController, saveJobController, updateCvController, updateDetailController, uploadCvController } from '../controller/employeesController.js'
+import { applyJobController, buyPlanController, createDetailController, createProfileController, createReportController, deleteCvController, favouriteJobController, getEmployeedataController, removeSaveJobController, saveJobController, updateCvController, updateDetailController, uploadCvController } from '../controller/employeesController.js'
 import { CV } from '../middleware/cv.js'
 import { userPhoto } from '../middleware/user_photo.js'
+import { report } from '../middleware/report.js'
 
 const createProfile=express.Router()
 createProfile.post('/create-profile',createProfileController)
@@ -40,4 +41,8 @@ removeSaveJob.delete('/remove-save-job/:id',removeSaveJobController)
 const applyJob=express.Router()
 applyJob.post('/apply-job',applyJobController)
 
-export {createProfile,getEmployeeData,favouriteJob,createDetail,editDetail,buyPlan,uploadCv,updateCv,deleteCv,saveJob,removeSaveJob,applyJob}
+//       Report
+const createReport=express.Router()
+createReport.post('/create-report',report,createReportController)
+
+export {createProfile,getEmployeeData,favouriteJob,createDetail,editDetail,buyPlan,uploadCv,updateCv,deleteCv,saveJob,removeSaveJob,applyJob,createReport}

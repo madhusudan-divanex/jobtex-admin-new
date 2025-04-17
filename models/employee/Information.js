@@ -3,7 +3,7 @@ import mongoose, { Schema } from 'mongoose';
 
 const informationSchema = new Schema({
     profile_url:String,
-    phone:Number,
+    phone:String,
     first_name:String,
     last_name:String,
     current_salary:Number,
