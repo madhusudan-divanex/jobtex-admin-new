@@ -79,13 +79,19 @@ Backend->CRUD on Promo code and Notification and Modify api
 
 Frontend
 TailoredJob Website->
-    Dynamic Category 
-    Dynamic Employment
+    login 
+    sign up 
+    personal detail 
+    manual experience 
+    cv upload
+    pricing 
 TailoredJob user->
-    Apply job 
-    Save Job 
-    Remove Save Job
-    Job Detail Page 
+    profile 
+    applied job 
+    save job 
+    job detail 
+    job list 
+    
      
 
 Backend

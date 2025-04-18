@@ -9,7 +9,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import {  getAllReport, getReportById } from './routes/report.js';
 import { adminLogin, getEmployeeAll, planEmployee } from './routes/admin/Login.js';
-import { applyJob, buyPlan, createDetail, createProfile, deleteCv, editDetail, favouriteJob, getEmployeeData, removeSaveJob, saveJob, updateCv, uploadCv,createReport } from './routes/employees.js';
+import { applyJob, buyPlan, createDetail, createProfile, deleteCv, editDetail, favouriteJob, getEmployeeData, removeSaveJob, saveJob, updateCv, uploadCv,createReport, getJobWithData } from './routes/employees.js';
 import { verifyToken } from './routes/verify-route.js';
 import { createCustomPlan, createPlan, deleteCustomPlan, deletePlan, getCustomPlan, getPlan, getPlanById, updateCustomPlan, updatePlan } from './routes/admin/Plan.js';
 import { createStaff, deleteStaff, getStaff, getStaffById, updateStaff } from './routes/admin/Staff.js';
@@ -42,6 +42,7 @@ app.use('/',forgotPass)
 app.use('/',deleteUser)
 
 //      employeer detail
+app.use('/',getJobWithData)
 app.use('/',createProfile)
 app.use('/',getEmployeeData)
 app.use('/',favouriteJob)

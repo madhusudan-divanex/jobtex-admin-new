@@ -17,8 +17,8 @@ import mongoose from "mongoose";
 import Report from "../models/Report.js";
 
 async function createProfileController(req, res) {
-console.log(req.body)
-    
+    console.log(req.body)
+
     const { first_name, last_name, current_salary, cs_currency, expected_salary, es_currency, email, phone, marital_status, gender, dob, user_id } = req.body;
     try {
         const findProfile = await User.find({ _id: user_id })
@@ -41,82 +41,153 @@ console.log(req.body)
 
 }
 
+
 async function getEmployeedataController(req, res) {
-   
-    const id = req.params.id
+    const id = req.params.id;
+  
     try {
-        const user = await User.findById(id);
-        const user_id = user._id
-        if (!user) {
-            return res.status(404).json({ message: "no user found", success: false });
-
-
-        } else {
-            const subscription = await Subscription.findOne({ user_id });
-            if (subscription) {
-                const currentDate = new Date();
-                if (subscription.end_date < currentDate && subscription.status !== 'expired') {
-                    // Update status to 'expired' if expired
-                    subscription.status = 'expired';
-                    await subscription.save();
-                }
-            }
-            const personal = await Information.findOne({ user_id })
-            const education = await Education.find({ user_id })
-            const experience = await Experience.find({ user_id })
-            const certification = await Certification.find({ user_id })
-            const language = await Language.find({ user_id })
-            const cvCount = await Cv.countDocuments({ user_id });
-             const favouriteJobCount = await SavedJob.countDocuments({ user_id });
-            const appliedJobCount = await ApplyJob.countDocuments({ user_id });
-            const totalJobCount = await Job.countDocuments();
-            const planData=await Subscription.find({user_id})
-            const favouriteJobDetails = await SavedJob.aggregate([
-                {
-                  $match: {
-                    user_id: new mongoose.Types.ObjectId(user_id)  // 👈 match specific user_id
-                  }
-                },
-                {
-                  $lookup: {
-                    from: "jobs",             // job collection
-                    localField: "job_id",     // field in SavedJob
-                    foreignField: "_id",      // matching field in Job
-                    as: "jobDetails"
-                  }
-                },
-                {
-                  $unwind: "$jobDetails"      // flatten jobDetails array
-                }
-              ]);
-              const applyJobDetails = await ApplyJob.aggregate([
-                {
-                  $match: {
-                    user_id: new mongoose.Types.ObjectId(user_id)  // 👈 match specific user_id
-                  }
-                },
-                {
-                  $lookup: {
-                    from: "jobs",             // job collection
-                    localField: "job_id",     // field in SavedJob
-                    foreignField: "_id",      // matching field in Job
-                    as: "jobDetails"
-                  }
-                },
-                {
-                  $unwind: "$jobDetails"      // flatten jobDetails array
-                }
-              ]);
-            
-              
-            return res.status(200).json({ user, personal,favouriteJobDetails,applyJobDetails, planData,education,totalJobCount, experience, certification, language, cvCount,favouriteJobCount,appliedJobCount, message: "user Fetched", success: true });
-
+      const user = await User.findById(id);
+      if (!user) {
+        return res.status(404).json({ message: "No user found", success: false });
+      }
+  
+      const user_id = user._id;
+  
+      // Check & update subscription status
+      const subscription = await Subscription.findOne({ user_id });
+      if (subscription) {
+        const currentDate = new Date();
+        if (subscription.end_date < currentDate && subscription.status !== 'expired') {
+          subscription.status = 'expired';
+          await subscription.save();
         }
+      }
+  
+      // Fetch user info
+      const personal = await Information.findOne({ user_id });
+      const education = await Education.find({ user_id });
+      const experience = await Experience.find({ user_id });
+      const certification = await Certification.find({ user_id });
+      const language = await Language.find({ user_id });
+      const cvCount = await Cv.countDocuments({ user_id });
+      const favouriteJobCount = await SavedJob.countDocuments({ user_id });
+      const appliedJobCount = await ApplyJob.countDocuments({ user_id });
+      const totalJobCount = await Job.countDocuments();
+      const planData = await Subscription.find({ user_id });
+  
+      // Fetch saved jobs
+      let favouriteJobDetails = await SavedJob.aggregate([
+        { $match: { user_id: new mongoose.Types.ObjectId(user_id) } },
+        {
+          $lookup: {
+            from: "jobs",
+            localField: "job_id",
+            foreignField: "_id",
+            as: "jobDetails"
+          }
+        },
+        { $unwind: "$jobDetails" }
+      ]);
+  
+      // Fetch applied jobs
+      let applyJobDetails = await ApplyJob.aggregate([
+        { $match: { user_id: new mongoose.Types.ObjectId(user_id) } },
+        {
+          $lookup: {
+            from: "jobs",
+            localField: "job_id",
+            foreignField: "_id",
+            as: "jobDetails"
+          }
+        },
+        { $unwind: "$jobDetails" }
+      ]);
+  
+      // If personal info and experience exist, calculate matching scores dynamically
+      if (personal && experience.length > 0) {
+        const userSkills = personal.skill || [];
+        const totalUserExperience = calculateTotalExperience(experience);
+  
+        // For Saved Jobs
+        favouriteJobDetails = favouriteJobDetails.map(favJob => {
+          const jobSkills = favJob.jobDetails.skills || [];
+          const jobExp = favJob.jobDetails.experience || 0;
+  
+          const matchedSkills = userSkills.filter(skill =>
+            jobSkills.some(jobSkill => jobSkill.toLowerCase() === skill.toLowerCase())
+          );
+  
+          const skillMatch = jobSkills.length > 0
+            ? (matchedSkills.length / jobSkills.length) * 100
+            : 0;
+  
+          const experienceMatch = jobExp > 0
+            ? Math.min((totalUserExperience / jobExp) * 100, 100)
+            : 100;
+  
+          const overallMatch = (skillMatch * 0.7 + experienceMatch * 0.3);
+  
+          return {
+            ...favJob,
+            overallMatch: Math.round(overallMatch),
+            skillMatch: Math.round(skillMatch),
+            experienceMatch: Math.round(experienceMatch)
+          };
+        });
+  
+        // For Applied Jobs
+        applyJobDetails = applyJobDetails.map(appliedJob => {
+          const jobSkills = appliedJob.jobDetails.skills || [];
+          const jobExp = appliedJob.jobDetails.experience || 0;
+  
+          const matchedSkills = userSkills.filter(skill =>
+            jobSkills.some(jobSkill => jobSkill.toLowerCase() === skill.toLowerCase())
+          );
+  
+          const skillMatch = jobSkills.length > 0
+            ? (matchedSkills.length / jobSkills.length) * 100
+            : 0;
+  
+          const experienceMatch = jobExp > 0
+            ? Math.min((totalUserExperience / jobExp) * 100, 100)
+            : 100;
+  
+          const overallMatch = (skillMatch * 0.7 + experienceMatch * 0.3);
+  
+          return {
+            ...appliedJob,
+            overallMatch: Math.round(overallMatch),
+            skillMatch: Math.round(skillMatch),
+            experienceMatch: Math.round(experienceMatch)
+          };
+        });
+      }
+  
+      // Final response
+      return res.status(200).json({
+        user,
+        personal,
+        favouriteJobDetails,
+        applyJobDetails,
+        planData,
+        education,
+        totalJobCount,
+        experience,
+        certification,
+        language,
+        cvCount,
+        favouriteJobCount,
+        appliedJobCount,
+        message: "User data fetched",
+        success: true
+      });
+  
     } catch (error) {
-console.log(error)
-        return res.status(500).json({ message: error.message, success: false });
+      console.log(error);
+      return res.status(500).json({ message: error.message, success: false });
     }
-}
+  }
+  
 async function favouriteJobController(req, res) {
 
     const { job_title, location, user_id } = req.body;
@@ -221,10 +292,10 @@ async function createDetailController(req, res) {
 
 
 async function updateDetailController(req, res) {
-    
+
     const { user_id } = req.body;
     const { educationForm, detailForm, experienceForm, certificationForm, languageForm, skillForm, userForm } = req.body;
-   
+
     try {
 
         const findUser = await User.findOne({ _id: user_id });
@@ -299,8 +370,8 @@ async function updateDetailController(req, res) {
         if (detailForm) {
             isDetailUpdated = true;
             const detForm = JSON.parse(detailForm)
-            const findPhoto=await Information.find({user_id})
-           
+            const findPhoto = await Information.find({ user_id })
+
             let newFilePath = findPhoto.company_photo; // Default to existing photo
 
             // If a new file was uploaded
@@ -314,11 +385,11 @@ async function updateDetailController(req, res) {
                     fs.unlinkSync(findPhoto[0].profile_url);
                 }
             }
-            
+
             await Information.findOneAndUpdate({ user_id },
                 {
-                    profile_url:newFilePath,about_me:detForm.about_me,first_name: detForm.first_name, last_name: detForm.last_name, phone: detForm.phone, current_salary: detForm.current_salary, cs_currency: detForm.cs_currency, expected_salary: detForm.expected_salary
-                    , es_currency: detForm.es_currency, marital_status: detForm.marital_status, gender: detForm.gender, dob: detForm.dob,job_title:detForm.job_title,skill:detForm.skill,employeer_skill:detForm.employeer_skill,location:detForm.location
+                    profile_url: newFilePath, about_me: detForm.about_me, first_name: detForm.first_name, last_name: detForm.last_name, phone: detForm.phone, current_salary: detForm.current_salary, cs_currency: detForm.cs_currency, expected_salary: detForm.expected_salary
+                    , es_currency: detForm.es_currency, marital_status: detForm.marital_status, gender: detForm.gender, dob: detForm.dob, job_title: detForm.job_title, skill: detForm.skill, employeer_skill: detForm.employeer_skill, location: detForm.location
                 }, { new: true });
             await User.findByIdAndUpdate({ _id: user_id }, { first_name: detForm.first_name, last_name: detForm.last_name }, { new: true })
 
@@ -466,64 +537,142 @@ async function deleteCvController(req, res) {
 }
 
 //          Job Controller
-async function saveJobController(req,res) {
-    const {user_id,job_id}=req.body
+async function saveJobController(req, res) {
+    const { user_id, job_id } = req.body
     try {
-        const findJob=await Job.findById(job_id)
-        if(findJob){
-            const addSaveJob=await SavedJob.create({user_id,job_id})
+        const findJob = await Job.findById(job_id)
+        if (findJob) {
+            const addSaveJob = await SavedJob.create({ user_id, job_id })
             return res.status(200).json({ message: "save successfully", success: true });
         }
-        return res.status(400).json({ message:"job not found", success: false });
+        return res.status(400).json({ message: "job not found", success: false });
     } catch (error) {
         return res.status(500).json({ message: error.message, success: false });
     }
 }
 
-async function removeSaveJobController(req,res) {
-    const job_id=req.params.id
- 
+async function removeSaveJobController(req, res) {
+    const job_id = req.params.id
+
     try {
-        const findJob=await SavedJob.findOne({job_id:job_id})
-        if(findJob){
-            const removeSaveJob=await SavedJob.findOneAndDelete({job_id})
+        const findJob = await SavedJob.findOne({ job_id: job_id })
+        if (findJob) {
+            const removeSaveJob = await SavedJob.findOneAndDelete({ job_id })
             return res.status(200).json({ message: "remove save successfully", success: true });
         }
-        return res.status(400).json({ message:"job not found", success: false });
+        return res.status(400).json({ message: "job not found", success: false });
     } catch (error) {
         console.log(error)
         return res.status(500).json({ message: error.message, success: false });
     }
 }
 
-async function applyJobController(req,res) {
-    const {user_id,job_id}=req.body
+async function applyJobController(req, res) {
+    const { user_id, job_id } = req.body
     try {
-        const findJob=await Job.findById(job_id)
-        if(findJob){
-            const addSaveJob=await ApplyJob.create({user_id,job_id})
+        const findJob = await Job.findById(job_id)
+        if (findJob) {
+            const addSaveJob = await ApplyJob.create({ user_id, job_id })
             return res.status(200).json({ message: "applied successfully", success: true });
         }
-        return res.status(400).json({ message:"job not found", success: false });
+        return res.status(400).json({ message: "job not found", success: false });
     } catch (error) {
         return res.status(500).json({ message: error.message, success: false });
     }
 }
 
-async function createReportController(req,res) {
-    const {user_id,subject,message,attachment}=req.body
+async function createReportController(req, res) {
+    const { user_id, subject, message, attachment } = req.body
     console.log(req.body)
     try {
-        const findUser=await User.findOne({_id:user_id})
-        if(findUser){
+        const findUser = await User.findOne({ _id: user_id })
+        if (findUser) {
             const path = req.files["attachment"] ? req.files["attachment"][0].path : null;
-            const addReport=await Report.create({user_id,subject,message,attachment:path})
+            const addReport = await Report.create({ user_id, subject, message, attachment: path })
             return res.status(200).json({ message: "contact successfully", success: true });
         }
-        return res.status(400).json({ message:"user not found", success: false });
+        return res.status(400).json({ message: "user not found", success: false });
     } catch (error) {
         return res.status(500).json({ message: error.message, success: false });
     }
 }
 
-export { createProfileController, getEmployeedataController, favouriteJobController, createDetailController, updateDetailController, buyPlanController, uploadCvController, updateCvController, deleteCvController ,saveJobController,removeSaveJobController,applyJobController,createReportController}
+
+async function getAllJobDataController(req, res) {
+    const user_id = req.params.id;
+    try {
+        const userInfo = await Information.findOne({ user_id });
+        const userSkills = userInfo?.skill || [];
+
+        const userExpData = await Experience.find({ user_id });
+        const userExperienceList = userExpData || [];
+
+        const allJobs = await Job.find();
+
+        if (allJobs.length === 0) {
+            return res.status(404).json({ message: "No jobs found", success: false });
+        }
+
+        const totalUserExperience = calculateTotalExperience(userExperienceList);
+
+        // Loop through jobs, enhance with matches and applied count
+        const enhancedJobs = await Promise.all(allJobs.map(async (job) => {
+            const jobSkills = job.skills || [];
+            const jobExp = job.experience || 0;
+
+            const matchedSkills = userSkills.filter(skill =>
+                jobSkills.some(jobSkill => jobSkill.toLowerCase() === skill.toLowerCase())
+            );
+
+            const skillMatch = jobSkills.length > 0
+                ? (matchedSkills.length / jobSkills.length) * 100
+                : 0;
+
+            const experienceMatch = jobExp > 0
+                ? Math.min((totalUserExperience / jobExp) * 100, 100)
+                : 100;
+
+            const overallMatch = (skillMatch * 0.7 + experienceMatch * 0.3);
+
+            // ✅ Fetch applied count for this job
+            const appliedCount = await ApplyJob.countDocuments({ job_id: job._id });
+
+            return {
+                ...job._doc,
+                skillMatch: Math.round(skillMatch),
+                experienceMatch: Math.round(experienceMatch),
+                overallMatch: Math.round(overallMatch),
+                appliedCount // ✅ include it here
+            };
+        }));
+
+        return res.status(200).json({
+            message: "Jobs found",
+            success: true,
+            job: enhancedJobs
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Server error", success: false });
+    }
+}
+
+function calculateTotalExperience(experiences) {
+    
+    let totalMonths = 0;
+
+    experiences.forEach(exp => {
+        if (exp.start_date && exp.end_date) {
+            const start = new Date(exp.start_date);
+            const end = new Date(exp.end_date);
+            const months = (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth());
+            totalMonths += months;
+        }
+    });
+
+    return totalMonths / 12; // Convert months to years
+}
+
+
+export { createProfileController, getEmployeedataController, favouriteJobController, createDetailController, updateDetailController, buyPlanController, uploadCvController, updateCvController, deleteCvController, saveJobController, removeSaveJobController, applyJobController, createReportController, getAllJobDataController }
