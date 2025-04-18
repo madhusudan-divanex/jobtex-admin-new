@@ -136,7 +136,7 @@ async function favouriteJobController(req, res) {
         return res.status(500).json({ message: "please do signup first", success: false })
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ message: error, success: false })
+        return res.status(500).json({ message: error.message, success: false })
     }
 
 }
@@ -367,7 +367,7 @@ async function buyPlanController(req, res) {
         //return res.status(500).json({ message: "please do signup first", success: false })
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ message: error, success: false })
+        return res.status(500).json({ message: error.message, success: false })
     }
 
 }
@@ -389,7 +389,7 @@ async function uploadCvController(req, res) {
         }
         return res.status(200).json({ message: "cv uploaded", success: true })
     } catch (error) {
-        return res.status(500).json({ message: error, success: false });
+        return res.status(500).json({ message: error.message, success: false });
     }
 }
 

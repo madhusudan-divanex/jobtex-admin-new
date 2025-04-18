@@ -145,7 +145,7 @@ async function updateStaffController(req, res) {
         }
     } catch (error) {
         console.log(error.message)
-        return res.status(500).json({ message: error, success: false })
+        return res.status(500).json({ message: error.message, success: false })
     }
 }
 

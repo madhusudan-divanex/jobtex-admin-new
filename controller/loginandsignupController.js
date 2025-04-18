@@ -59,7 +59,7 @@ async function loginController(req, res) {
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ message: error, success: false })
+        return res.status(500).json({ message: error.message, success: false })
     }
 }
 async function signUpController(req, res) {
@@ -96,7 +96,7 @@ async function signUpController(req, res) {
             return res.status(400).json({ message: error.message, success: false });
         }
         console.log(error)
-        return res.status(500).json({ message: error, success: false })
+        return res.status(500).json({ message: error.message, success: false })
     }
 }
 
@@ -109,7 +109,7 @@ async function profileVerifyController(req, res) {
         return res.status(200).json({ message: "mail sent", success: true })
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ message: error, success: false })
+        return res.status(500).json({ message: error.message, success: false })
     }
 }
 
@@ -125,7 +125,7 @@ async function resetController(req, res) {
         }
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ message: error, success: false })
+        return res.status(500).json({ message: error.message, success: false })
     }
 }
 async function forgotController(req, res) {
@@ -138,7 +138,7 @@ async function forgotController(req, res) {
         return res.status(200).json({ message: "mail sent", success: true })
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ message: error, success: false })
+        return res.status(500).json({ message: error.message, success: false })
     }
 }
 
